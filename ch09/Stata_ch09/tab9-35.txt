@@ -1,0 +1,23 @@
+		(1)	(2)
+		base case car	base case air
+VARIABLES	LABELS	Binary choice	Binary choice
+			
+gc	Generalized cost	-0.0155***	-0.0155***
+		(0.00441)	(0.00441)
+twait	Terminal wait time	-0.0961***	-0.0961***
+		(0.0104)	(0.0104)
+hinca	Income-air	0.0133	0.0133
+		(0.0103)	(0.0103)
+aasc	Air alternative-specific constant	5.207***	
+		(0.779)	
+tasc	Train alternative-specific constant	3.869***	-1.338**
+		(0.443)	(0.543)
+basc	Bus alternative-specific constant	3.163***	-2.044***
+		(0.450)	(0.555)
+casc	Car alternative-specific constant		-5.207***
+			(0.779)
+			
+Observations		840	840
+Pseudo R-squared		0.316	0.316
+Standard errors in parentheses			
+*** p<0.01, ** p<0.05, * p<0.1			

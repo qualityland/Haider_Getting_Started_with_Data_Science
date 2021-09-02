@@ -1,0 +1,78 @@
+{smcl}
+{com}{sf}{ul off}{txt}{.-}
+      name:  {res}<unnamed>
+       {txt}log:  {res}F:\Research\All_else_being_equal\Chapters\Ch_4\Stata\Beauty results Chapter 4.smcl
+  {txt}log type:  {res}smcl
+ {txt}opened on:  {res} 1 Sep 2014, 20:10:39
+{txt}
+{com}. table gender tenure, contents(mean eval sd eval ) format (%8.2f)
+
+{txt}{hline 10}{c TT}{hline 11}
+          {c |}  tenured  
+   gender {c |}   no   yes
+{hline 10}{c +}{hline 11}
+   female {c |} {res}3.86  3.92
+          {txt}{c |} {res}0.47  0.56
+          {txt}{c |} 
+     male {c |} {res}4.40  3.99
+          {txt}{c |} {res}0.50  0.54
+{txt}{hline 10}{c BT}{hline 11}
+
+{com}. log close
+      {txt}name:  {res}<unnamed>
+       {txt}log:  {res}F:\Research\All_else_being_equal\Chapters\Ch_4\Stata\Beauty results Chapter 4.smcl
+  {txt}log type:  {res}smcl
+ {txt}closed on:  {res} 1 Sep 2014, 20:10:39
+{txt}{.-}
+{smcl}
+{txt}{sf}{ul off}{smcl}
+{com}{sf}{ul off}{txt}{.-}
+      name:  {res}<unnamed>
+       {txt}log:  {res}F:\Research\All_else_being_equal\Chapters\Ch_4\Stata\Beauty results Chapter 4.smcl
+  {txt}log type:  {res}smcl
+ {txt}opened on:  {res} 1 Sep 2014, 20:10:39
+{txt}
+{com}. table gender tenure minority,  contents(mean eval sd eval ) format (%8.2f)
+
+{txt}{hline 10}{c TT}{hline 25}
+          {c |}   minority and tenured  
+          {c |} {hline 3} no {hline 3}    {hline 3} yes {hline 2}
+   gender {c |}   no   yes      no   yes
+{hline 10}{c +}{hline 25}
+   female {c |} {res}3.86  3.97          3.74
+          {txt}{c |} {res}0.47  0.56          0.52
+          {txt}{c |} 
+     male {c |} {res}4.30  4.02    4.78  3.71
+          {txt}{c |} {res}0.52  0.54    0.15  0.48
+{txt}{hline 10}{c BT}{hline 25}
+
+{com}. table gender tenure, contents(mean eval sd eval ) by(minority) format (%8.2f)
+
+{txt}{hline 10}{c TT}{hline 11}
+minority  {c |}
+and       {c |}  tenured  
+gender    {c |}   no   yes
+{hline 10}{c +}{hline 11}
+no        {c |}
+   female {c |} {res}3.86  3.97
+          {txt}{c |} {res}0.47  0.56
+          {txt}{c |} 
+     male {c |} {res}4.30  4.02
+          {txt}{c |} {res}0.52  0.54
+{txt}{hline 10}{c +}{hline 11}
+yes       {c |}
+   female {c |}     {res}  3.74
+          {txt}{c |}     {res}  0.52
+          {txt}{c |} 
+     male {c |} {res}4.78  3.71
+          {txt}{c |} {res}0.15  0.48
+{txt}{hline 10}{c BT}{hline 11}
+
+{com}. log close
+      {txt}name:  {res}<unnamed>
+       {txt}log:  {res}F:\Research\All_else_being_equal\Chapters\Ch_4\Stata\Beauty results Chapter 4.smcl
+  {txt}log type:  {res}smcl
+ {txt}closed on:  {res} 1 Sep 2014, 20:10:39
+{txt}{.-}
+{smcl}
+{txt}{sf}{ul off}

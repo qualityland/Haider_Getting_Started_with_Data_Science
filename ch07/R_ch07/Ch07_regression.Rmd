@@ -1,0 +1,403 @@
+---
+title: "Ch_07_Regression Analysis"
+author: "Murtaza Haider"
+date: "January 16, 2016"
+output: html_document
+---
+
+
+
+##Download data
+
+**Downloading** data from the website. The download command downloads data in the working directory.
+
+Data are downloaded, loaded, and names of fields are read from the file:
+
+```{r}
+setInternet2(TRUE) # solution for https files
+
+download.file("https://sites.google.com/site/econometriks/docs/housing88.RData", "housing88.RData")
+
+load("housing88.RData")
+setwd("C:/Users/Regionomics/Documents/Research_2/All_else_being_equal/Chapters/Ch07_Regression/Data/Regression_housing/Housing prices/88_units")
+
+names(housing88)
+```
+
+
+**Loading** required packages and **attaching** the data set.
+```{r}
+attach(housing88)
+```
+
+
+```{r}
+library(lattice)
+lattice.options(default.theme = standard.theme(color = FALSE))
+trellis.device(color = FALSE)
+```
+
+
+### Figure 7.3
+
+```{r,results='asis'}
+options(scipen=10)
+xyplot(hprice ~ sqrft, data = housing88,
+       type = c("p", "g", "r"), pch=16, lwd=2, col.symbol = "black",
+       xlab = "size of house in square feet",
+       ylab= "housing price")
+```
+
+
+### Table 7.5
+
+```{r,results='asis'}
+library(stargazer)
+stargazer(housing88, type="html", digits=2)
+```
+
+### Figure 7.4
+
+```{r, results= 'asis'}
+
+histogram(lotsize, nint=10,
+          xlab="size of lot in square feet", col=c("dark grey"))
+
+```
+
+### Figure 7.5
+
+```{r}
+
+mod1<-(lm(hprice~bdrms+lotsize+sqrft+colonial))
+summary(mod1)
+
+```
+
+### Table 7.6
+
+```{r, results='asis'}
+
+stargazer(mod1,type='html', no.space=TRUE, align=TRUE,
+          dep.var.labels=c("House price"),
+          covariate.labels=c("number of bedrooms", 
+                             "size of lot in square feet",
+                             "size of house in square feet",
+                             "=1, if Colonial style"))
+
+```
+
+
+### Table 7.7
+
+
+```{r}
+library(psych)
+library(xtable)
+library(htmlTable)
+```
+
+
+```{r}
+f <- function(x) c(obs=length(x), mean=mean(x), sd=sd(x))
+tres<-as.matrix(aggregate(hprice ~ bdrms, FUN=c("f")))
+colnames(tres)[2:4]<-c("n", "mean", "std. dev.")
+htmlTable(txtRound(tres,0))
+```
+
+
+### Table 7.8
+
+```{r, results='asis'}
+mod2<-lm(hprice ~ factor(bdrms))
+stargazer(mod2,type='html', no.space=TRUE, align=TRUE, digits=2,
+          dep.var.labels=c("House price"))
+```
+
+
+### Table 7.9
+
+```{r, results='asis'}
+mod3<-lm(hprice ~ bdrms)
+mod4<-lm(hprice ~ bdrms + lotsize )
+mod5<-lm(hprice ~ bdrms + sqrft )
+mod6<-lm(hprice ~ bdrms + lotsize + sqrft )
+mod7<-lm(hprice ~ bdrms + lotsize + sqrft + colonial)
+
+stargazer(mod3, mod4, mod5, mod6, mod7, type="html", align=TRUE, no.space=TRUE, 
+          digits=2, dep.var.labels=c("house price"),
+           covariate.labels=c("number of bedrooms", 
+                             "size of lot in square feet",
+                             "size of house in square feet",
+                             "=1, if Colonial style"))
+
+```
+
+### Table 7.11
+names(housing88)
+
+```{r, results='asis'}
+mod3<-lm(lprice ~ lsqrft)
+mod4<-lm(lprice ~ colonial)
+mod5<-lm(lprice ~ bdrms + bedsq )
+
+stargazer(mod3, mod4, mod5, type="html", align=TRUE, no.space=TRUE, 
+          digits=2, dep.var.labels=c("log of house price"),
+           covariate.labels=c("log of built area", 
+                              "=1, if Colonial style",
+                             "number of bedrooms",
+                             "beds squared"))
+
+```
+
+# Teaching Ratings
+
+```{r}
+setInternet2(TRUE) # solution for https files
+
+download.file("https://sites.google.com/site/statsr4us/intro/software/rcmdr-1/TeachingRatings.rda", "TeachingRatings.rda")
+
+load("TeachingRatings.rda")
+names(TeachingRatings)
+attach(TeachingRatings)
+```
+
+### Table 7.13
+
+
+```{r, results='asis'}
+
+mod3<-lm(eval ~ gender )
+mod4<-lm(eval ~ gender + minority + native)
+mod5<-lm(eval ~ gender + minority + native + tenure + division +credits)
+mod6<-lm(eval ~ gender + minority + native + tenure + division +credits + 
+           beauty)
+
+stargazer(mod3, mod4, mod5, mod6, type="html", align=TRUE, no.space=TRUE, 
+          digits=2, dep.var.labels=c("teaching evaluation score"),
+           covariate.labels=c("female", "minority instructor",
+                              "NON-native English speaker", "tenured professor",
+                              "lower division", "single credit", 
+                              "normalized score of instructor's appearance",
+                              "intercept"))
+
+```
+
+
+### Table 7.14
+
+```{r, echo=FALSE}
+TeachingRatings$weights <- students/allstudents
+attach(TeachingRatings)
+library(sandwich)
+library(lmtest)
+library(multiwayvcov)
+```
+
+
+
+```{r, results='asis'}
+
+modw1<-lm(eval ~ gender + minority + native + tenure + division +credits + beauty)
+modw2<-lm(eval ~ gender + minority + native + tenure + division +credits +
+           beauty, weight=weights)
+
+vcov_prof <- cluster.vcov(modw2, TeachingRatings$prof)
+# coeftest(modw2, vcov_prof)
+
+robust.se <- sqrt(diag(vcov_prof))
+
+stargazer(modw1, modw2, modw2, type="html", align=TRUE, no.space=TRUE, 
+           se=list(NULL, NULL, robust.se),
+          digits=3, dep.var.labels=c("teaching evaluation score"),
+          column.labels=c("un-weighted model","weighted model",
+                         "weighted model w/ clustered std. errors"),
+          covariate.labels=c("female", "minority instructor",
+                             "NON-native English speaker", "tenured professor",
+                              "lower division", "single credit", 
+                              "normalized beauty score",
+                              "intercept"))
+
+```
+
+
+
+# Expenses
+
+```{r, echo=FALSE}
+setInternet2(TRUE) # solution for https files
+
+download.file("https://sites.google.com/site/econometriks/docs/hhld_expenses.rda", "hhld_expenses.rda")
+
+load("hhld_expenses.rda")
+names(Dataset)
+attach(Dataset)
+```
+
+## Alcohol
+
+### Table 7.16
+
+```{r,results='asis'}
+stargazer(Dataset, type="html", digits=2)
+```
+
+
+### Table 7.17
+```{r}
+f <- function(x) c( mean=mean(x), obs=length(x))
+tres<-as.matrix(aggregate(alcoh ~ kids.f, FUN=c("f")))
+colnames(tres)[1:3]<-c("children in hhld", "mean", "n")
+htmlTable(txtRound(tres,1))
+```
+
+### Table 7.18
+
+```{r, results='asis'}
+lm.1 <- lm(alcoh ~ adults, data=Dataset)
+lm.2 <- lm(alcoh ~ adults + income, data=Dataset)
+lm.3 <- lm(alcoh ~ adults + income + kids, data=Dataset)
+lm.4 <- lm(alcoh ~ adults + income + kids, subset= kids>0 ,
+        data=Dataset)
+
+stargazer(lm.1, lm.2, lm.3, lm.4, type="html", align=TRUE, no.space=TRUE, 
+          digits=2, dep.var.labels=c("spending on alcohol"),
+          column.labels=c("alcohol", "alcohol, households with children"),
+          column.separate = c(3,1),
+           covariate.labels=c("adults in hhld", "weekly income",
+                              "children in hhld"))
+```
+tres
+
+
+### Figure 7.7
+
+```{r, results='asis'}
+barplot(tapply(alcoh,kids,mean), ylim =c(0,40),
+        ylab="Weekly household spending on alcohol ($)", 
+        xlab = "No. of children",
+        main="Weekly spending on alcohol (Canadian $)")
+```
+
+### Table 7.19
+
+```{r, results='asis'}
+lm.3 <- lm(alcoh ~ income + factor(adults) +  factor(kids), data=Dataset)
+stargazer(lm.3, type="html", align=TRUE, no.space=TRUE, 
+          digits=2, dep.var.labels=c("spending on alcohol"))
+
+```
+  
+  
+## Food
+
+
+### Table 7.20
+```{r}
+f <- function(x) c( mean=mean(x), obs=length(x))
+tres<-as.matrix(aggregate(food ~ kids.f, FUN=c("f")))
+colnames(tres)[1:3]<-c("children in hhld", "mean", "n")
+htmlTable(txtRound(tres,1))
+```  
+
+### Table 7.21
+
+```{r, results='asis'}
+lm.1 <- lm(food ~ adults, data=Dataset)
+lm.2 <- lm(food ~ adults + income, data=Dataset)
+lm.3 <- lm(food ~ adults + income + kids, data=Dataset)
+lm.4 <- lm(food ~ adults + income + kids, subset= kids>0 ,
+        data=Dataset)
+
+stargazer(lm.1, lm.2, lm.3, lm.4, type="html", align=TRUE, no.space=TRUE, 
+          digits=2, dep.var.labels=c("spending on food"),
+          column.labels=c("food", "food, households with children"),
+          column.separate = c(3,1),
+           covariate.labels=c("adults in hhld", "weekly income",
+                              "children in hhld"))
+
+```
+
+
+
+### Table 7.22
+
+```{r, results='asis'}
+lm.3 <- lm(food ~ income + factor(adults) +  factor(kids), data=Dataset)
+stargazer(lm.3, type="html", align=TRUE, no.space=TRUE, 
+          digits=2, dep.var.labels=c("spending on food"))
+
+```
+
+### Table 7.23
+
+```{r, results='asis'}
+mod1<-lm(hprice~ lotsize+sqrft+bdrms)
+
+res1 <- resid(mod1)
+res2<-res1^2
+
+mod2 <- lm(res2 ~ lotsize+sqrft+bdrms)
+
+stargazer(mod1, mod2, type="html", align=TRUE, no.space=TRUE, 
+          digits=2, dep.var.labels=c("housing price", "residuals squared"),
+          column.labels=c("BP Test, original model",
+          "BP Test, Residual Squared model"),
+          covariate.labels=c("size of lot in sqr. ft.", "house size in sqr. ft.",
+                              "number of bedrooms"))
+```
+
+### Table 7.24
+
+```{r, results='asis'}
+mod1<-lm(lprice~ llotsize+lsqrft+lnrooms)
+
+res1 <- resid(mod1)
+res2<-res1^2
+
+mod2 <- lm(res2 ~ llotsize+lsqrft+lnrooms)
+
+stargazer(mod1, mod2, type="html", align=TRUE, no.space=TRUE, 
+          digits=2, dep.var.labels=c("log of housing price", "residuals squared"),
+          column.labels=c("BP Test, original model",
+          "BP Test, Residual Squared model"),
+          covariate.labels=c("size of lot in sqr. ft.", "house size in sqr. ft.",
+                              "number of bedrooms"))
+```
+
+
+### Table 7.25
+
+```{r, results='asis'}
+mod1<-lm(hprice~ lotsize+sqrft+bdrms)
+
+library(sandwich)
+cov <- vcovHC(mod1, type = "HC1")
+robust.se <- sqrt(diag(cov))
+
+stargazer(mod1, mod1, type="html", align=TRUE, no.space=TRUE,
+          se=list(NULL, robust.se),
+          digits=2, column.labels=c("Default SE", "Robust SE"),
+          covariate.labels=c("size of lot in sqr. ft.", "house size in sqr. ft.",
+                              "number of bedrooms"))
+```
+
+
+### Table 7.26
+
+```{r, results='asis'}
+mod1<-lm(hprice~ bdrms)
+mod2<-lm(hprice~ bdrms +sqrft)
+mod3<-lm(hprice~ bdrms +sqrft+lotsize)
+
+
+stargazer(mod1, mod2, mod3, type="html", align=TRUE, no.space=TRUE,
+          digits=2, column.labels=c("beds", "beds+sqrft", "beds+sqrft+lotsize"),
+          covariate.labels=c("number of bedrooms",
+                             "house size in sqr. ft.", "size of lot in sqr. ft."))
+```
+      
+      
+      
+      
+---

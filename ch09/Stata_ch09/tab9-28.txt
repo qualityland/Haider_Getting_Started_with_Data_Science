@@ -1,0 +1,90 @@
+		(1)	(2)	(3)
+VARIABLES	LABELS	unemployed	part_time	full_time
+				
+unemployed				
+				
+2o.hhi	hhi = 2, omitted	-		
+				
+2o.education	education = 2, omitted	-		
+				
+3o.education	education = 3, omitted	-		
+				
+4o.education	education = 4, omitted	-		
+				
+5o.education	education = 5, omitted	-		
+				
+6o.education	education = 6, omitted	-		
+				
+2o.race	race = 2, omitted	-		
+				
+3o.race	race = 3, omitted	-		
+				
+2o.hispanic	hispanic = 2, omitted	-		
+				
+o.experience	experience = o,	-		
+				
+o.exp2	exp2 = o,	-		
+				
+o.exp3	exp3 = o,	-		
+				
+o.kidslt6	kidslt6 = o,	-		
+				
+o.kids618	kids618 = o,	-		
+				
+o.husby	husby = o,	-		
+				
+2o.region	region = 2, omitted	-		
+				
+3o.region	region = 3, omitted	-		
+				
+4o.region	region = 4, omitted	-		
+				
+o._cons		1		
+		(0)		
+part_time				
+				
+2.hhi	hhi = 2, yes		1.067	0.496***
+			(0.0499)	(0.0188)
+2.education	education = 2, 9-11years		1.244	1.180
+			(0.174)	(0.124)
+3.education	education = 3, 12years		2.314***	2.531***
+			(0.288)	(0.236)
+4.education	education = 4, 13-15years		3.063***	3.202***
+			(0.394)	(0.311)
+5.education	education = 5, 16years		3.067***	4.006***
+			(0.416)	(0.414)
+6.education	education = 6, >16years		3.934***	6.669***
+			(0.630)	(0.831)
+2.race	race = 2, black		0.842*	1.719***
+			(0.0853)	(0.124)
+3.race	race = 3, other		0.586	0.836
+			(0.202)	(0.198)
+2.hispanic	hispanic = 2, yes		0.634***	0.715***
+			(0.0684)	(0.0584)
+experience	experience		1.007	1.112***
+			(0.0233)	(0.0215)
+exp2	exp2		0.943	0.624***
+			(0.0968)	(0.0534)
+exp3	exp3		0.999	1.002**
+			(0.00134)	(0.00112)
+kidslt6	kidslt6		0.552***	0.328***
+			(0.0208)	(0.0107)
+kids618	kids618		0.953**	0.677***
+			(0.0232)	(0.0144)
+husby	husby		0.996***	0.995***
+			(0.000996)	(0.000822)
+2.region	region = 2, northcentral		1.033	1.122**
+			(0.0628)	(0.0594)
+3.region	region = 3, south		0.601***	0.923*
+			(0.0357)	(0.0451)
+4.region	region = 4, west		0.791***	0.848***
+			(0.0508)	(0.0466)
+full_time				
+				
+Constant	Constant		0.778	2.591***
+			(0.158)	(0.423)
+				
+Observations		22,272	22,272	22,272
+Pseudo R-squared		0.118	0.118	0.118
+seEform in parentheses				
+*** p<0.01, ** p<0.05, * p<0.1				

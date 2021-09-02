@@ -1,0 +1,149 @@
+---
+title: "Chapter 9"
+author: "Murtaza Haider"
+date: "October 22, 2015"
+output: html_document
+---
+
+#Health Insurance Data
+
+```{r}
+setInternet2(TRUE) # solution for https files
+download.file("https://sites.google.com/site/econometriks/docs/insurance.rda", "HI.Rdata")
+load("HI.RData")
+ ##save file
+save(HI, file= "HI.rda")
+
+## list variables
+names(HI)
+
+```
+
+
+```{r, message=FALSE}
+
+attach(HI)
+
+```
+
+```{r}
+library(xtable)
+library(htmlTable)
+
+```
+
+##Summary Statistics
+
+###Table 9.26
+
+```{r, results='asis'}
+t1<- xtabs(~ hhi + lfp); insx= round(prop.table(t1,1)*100,2)
+t1<- xtabs(~ edu2 + lfp); edux= round(prop.table(t1,1)*100,2)
+t1<- xtabs(~ race2 + lfp); racex= round(prop.table(t1,1)*100,2)
+exper.years<- round(tapply(experience, lfp,mean),2)
+kids.under.6<- round(tapply(kidslt6, lfp,mean),2)
+kids.6.to.18<- round(tapply(kids618, lfp,mean),2)
+husb.inc<- round(tapply(husby, lfp,mean),2)
+t1<- xtabs(~ region + lfp); regionx= round(prop.table(t1,1)*100,2)
+
+tab<- rbind(insx, edux, racex, exper.years, kids.under.6, kids.6.to.18, husb.inc, regionx)
+tab1<-xtable(tab)
+print(tab1, type="html")
+
+htmlTable(txtRound(tab1,0, excl.rows = c(13,14)),
+          rgroup=c("Husband's insurance covers wife (%)",
+                   "Education status (%)",
+                   "Race (%)",
+                   "Experience in years",
+                   "Children less than 6 years old",
+                   "Children between 6 and 18 years old",
+                   "Husband's income",
+                   "Region of origin (%)"),
+          n.rgroup = c(2,6,3,1,1,1,1,4),
+          cgroup = c("Wives' Work Status"),
+          n.cgroup = c(3),
+          rowlabel="Demographic Attributes")
+
+
+```
+
+
+##Binary Model
+
+
+```{r, results='asis'}
+library(stargazer)
+
+table(HI$lfp_yn)
+
+rm(mod.1)
+mod.1<-glm(formula = lfp_yn ~ hhi + factor(edu2) +race2 +
+    factor(hispanic)+ experience + exp2 +exp3 +kidslt6 +
+    kids618 + husby +factor(region), weight=mean_wt,
+    family = binomial(link = "probit"), 
+    data=HI)
+stargazer(mod.1, type="html", no.space=TRUE,
+          covariate.labels = c("Wife covered by husband's insurance", "9-11 years education", 
+          "12 years education", "13-15 years education", "16 years education",
+          "GT 16 years education", "African-American", "Other race", "Hispanic",
+          "Years of potential work experience", "Potential LF exp2/100",
+          "Potential LF exp3/100"  ,"No. of children < 6 years old",
+          "No. of children 6±18 years old", "Husband's income in thousands",
+          "North Central Region", "South Region", "West Region"))
+```
+
+
+
+```{r, message=FALSE}
+library(nnet)
+rm(mod.2)
+mod.2<- multinom(lfp ~ hhi + factor(edu2) + race2 +
+                   factor(hispanic)+ experience + exp2 +exp3 +kidslt6 +
+                   kids618 + husby +factor(region), weight=mean_wt, data=HI)
+```
+
+****
+
+### Table 9.27
+
+```{r, results='asis'}
+stargazer(mod.2, type="html", no.space=TRUE,
+          covariate.labels = c("Wife covered by husband's insurance", "9-11 years education", 
+          "12 years education", "13-15 years education", "16 years education",
+          "GT 16 years education", "African-American", "Other race", "Hispanic",
+          "Years of potential work experience", "Potential LF exp2/100",
+          "Potential LF exp3/100"  ,"No. of children < 6 years old",
+          "No. of children 6±18 years old", "Husband's income in thousands",
+          "North Central Region", "South Region", "West Region"))
+```
+
+### Table 9.28 and Table 9.29
+
+```{r, results='asis'}
+
+exponentiate <- function(x) exp(x)
+stargazer(mod.2, type="html", no.space=TRUE, apply.coef= exponentiate, se= list(NA),
+         covariate.labels = c("Wife covered by husband's insurance", "9-11 years education", 
+          "12 years education", "13-15 years education", "16 years education",
+          "GT 16 years education", "African-American", "Other race", "Hispanic",
+          "Years of potential work experience", "Potential LF exp2/100",
+          "Potential LF exp3/100"  ,"No. of children < 6 years old",
+          "No. of children 6±18 years old", "Husband's income in thousands",
+          "North Central Region", "South Region", "West Region"))
+
+
+percentx <- function(x) (exp(x)-1)*100
+stargazer(mod.2, type="html", no.space=TRUE, apply.coef= percentx, se= list(NA),
+         covariate.labels = c("Wife covered by husband's insurance", "9-11 years education", 
+          "12 years education", "13-15 years education", "16 years education",
+          "GT 16 years education", "African-American", "Other race", "Hispanic",
+          "Years of potential work experience", "Potential LF exp2/100",
+          "Potential LF exp3/100"  ,"No. of children < 6 years old",
+          "No. of children 6±18 years old", "Husband's income in thousands",
+          "North Central Region", "South Region", "West Region"))
+
+
+```
+
+
+

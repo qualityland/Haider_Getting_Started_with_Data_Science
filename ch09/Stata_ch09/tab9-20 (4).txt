@@ -1,0 +1,73 @@
+	(1)	(2)	(3)	(4)	(5)	(6)
+	logit RRR					
+VARIABLES	Met_online	Met_offline	Met_online	Met_offline	Met_online	Met_offline
+						
+Met_online						
+						
+2.sex	0.956		-4.434		-4.434	
+	(0.384)					
+2.cregion	0.859		-14.14		-14.14	
+	(0.561)					
+3.cregion	0.953		-4.682		-4.682	
+	(0.520)					
+4.cregion	1.293		29.30		29.30	
+	(0.750)					
+2.mar	3.714**		271.4**		271.4**	
+	(1.953)					
+3.mar	2.519		151.9		151.9	
+	(1.795)					
+4.mar	6.48e-07		-100.00		-100.00	
+	(0.00186)					
+5.mar	6.75e-07		-100.00		-100.00	
+	(0.00181)					
+6.mar	1.532		53.23		53.23	
+	(0.961)					
+2.email	0.396		-60.37		-60.37	
+	(0.417)					
+2.flirtonline	0.175***		-82.54***		-82.54***	
+	(0.0789)					
+age	1.006		0.631		0.631	
+	(0.0159)					
+2.community	1.360		35.96		35.96	
+	(0.828)					
+3.community	1.359		35.90		35.90	
+	(0.837)					
+Met_offline						
+						
+2o.sex		-		-		-
+						
+2o.cregion		-		-		-
+						
+3o.cregion		-		-		-
+						
+4o.cregion		-		-		-
+						
+2o.mar		-		-		-
+						
+3o.mar		-		-		-
+						
+4o.mar		-		-		-
+						
+5o.mar		-		-		-
+						
+6o.mar		-		-		-
+						
+2o.email		-		-		-
+						
+2o.flirtonline		-		-		-
+						
+o.age		-		-		-
+						
+2o.community		-		-		-
+						
+3o.community		-		-		-
+						
+o._cons		1		0		0
+		(0)				
+Constant	0.0753**		-92.47**		-92.47**	
+	(0.0812)					
+						
+Observations	627	627	627	627	627	627
+Pseudo R-squared	0.146	0.146				
+seEform in parentheses						
+*** p<0.01, ** p<0.05, * p<0.1						

@@ -1,0 +1,69 @@
+		(1)	(2)
+		logit	
+VARIABLES	LABELS	Met_online	Met_offline
+			
+2.sex	SEX. Respondent's sex = 2, female	-0.0454	
+		(0.402)	
+2.cregion	Census Region - 2012 zip merge = 2, Midwest	-0.152	
+		(0.654)	
+3.cregion	Census Region - 2012 zip merge = 3, South	-0.0480	
+		(0.546)	
+4.cregion	Census Region - 2012 zip merge = 4, West	0.257	
+		(0.580)	
+2.mar	MAR. Are you currently married, living with a partner, divorced, separated, wido = 2, Living with a partner	1.312**	
+		(0.526)	
+3.mar	MAR. Are you currently married, living with a partner, divorced, separated, wido = 3, Divorced	0.924	
+		(0.712)	
+4.mar	MAR. Are you currently married, living with a partner, divorced, separated, wido = 4, Separated	-14.25	
+		(2,864)	
+5.mar	MAR. Are you currently married, living with a partner, divorced, separated, wido = 5, Widowed	-14.21	
+		(2,682)	
+6.mar	MAR. Are you currently married, living with a partner, divorced, separated, wido = 6, Never been married	0.427	
+		(0.627)	
+2.email	EMLOCC. Do you send or receive email, at least occasionally? = 2, No	-0.926	
+		(1.053)	
+2.flirtonline	INTDATEb. Have you ever -- Flirted with someone online? = 2, No	-1.745***	
+		(0.452)	
+age	AGE. What is your age?	0.00629	
+		(0.0158)	
+2.community	community = 2, suburban	0.307	
+		(0.609)	
+3.community	community = 3, urban	0.307	
+		(0.616)	
+2o.sex	SEX. Respondent's sex = 2, omitted		-
+			
+2o.cregion	Census Region - 2012 zip merge = 2, omitted		-
+			
+3o.cregion	Census Region - 2012 zip merge = 3, omitted		-
+			
+4o.cregion	Census Region - 2012 zip merge = 4, omitted		-
+			
+2o.mar	MAR. Are you currently married, living with a partner, divorced, separated, wido = 2, omitted		-
+			
+3o.mar	MAR. Are you currently married, living with a partner, divorced, separated, wido = 3, omitted		-
+			
+4o.mar	MAR. Are you currently married, living with a partner, divorced, separated, wido = 4, omitted		-
+			
+5o.mar	MAR. Are you currently married, living with a partner, divorced, separated, wido = 5, omitted		-
+			
+6o.mar	MAR. Are you currently married, living with a partner, divorced, separated, wido = 6, omitted		-
+			
+2o.email	EMLOCC. Do you send or receive email, at least occasionally? = 2, omitted		-
+			
+2o.flirtonline	INTDATEb. Have you ever -- Flirted with someone online? = 2, omitted		-
+			
+o.age	AGE. What is your age? = o,		-
+			
+2o.community	community = 2, omitted		-
+			
+3o.community	community = 3, omitted		-
+			
+o._cons			0
+			(0)
+Constant	Constant	-2.587**	
+		(1.079)	
+			
+Observations		627	627
+Pseudo R-squared		0.146	0.146
+Standard errors in parentheses			
+*** p<0.01, ** p<0.05, * p<0.1			

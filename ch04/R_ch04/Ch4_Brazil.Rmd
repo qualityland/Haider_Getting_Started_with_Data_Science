@@ -1,0 +1,470 @@
+
+Chapter 4: Serving Tables
+========================================================
+
+
+```{r, eval=FALSE}
+---
+title: "Chapter 4 Brazil table"
+author: Murtaza Haider
+date: June 20, 2015
+---
+```
+
+##Using PEW 2010 data set from Global Attitudes##
+
+**Subsetting to Brazil**
+
+
+**Downloading** data from the website. The download command downloads data in the working directory.
+
+Data are downloaded, loaded, and names of fields are read from the file:
+
+```{r}
+setInternet2(TRUE) # solution for https files
+download.file("https://sites.google.com/site/econometriks/docs/brazil.RData", "brazil2.RData")
+load("brazil2.Rdata")
+#load("F:/Research/All_else_being_equal/Chapters/Ch_4_serving tables/R files/Brazil/brazil.RData")
+names(brazil)
+```
+
+There are 20 variables in the file. 
+
+## Story Line
+
+Never seen more serene vistas than Rio. A city in continuous celebration.
+Growing market, identified by Goldman Sachs in BRICS.
+
+*Focus: Internet and social media.*
+
+Data: Brazil
+
+Question: What has age, sex, education, income, ethnicity, and political affiliation to do with the use of Internet and social media?
+
+Illustration of tables
+Data set has been cleaned for the following:
+* Subsetted
+* Column names changed to more common sense explanations 
+* new derived variables.
+
+Start with summary statistics. Display the actual output and then show it should be printed. Using Excel and HTML and the Word files.
+
+### Descriptive statistics
+
+
+Starting with the first variable: country.
+
+*R specific quirk with factors*
+
+Fixing the country variable with refactoring.
+```{r}
+library(xtable)
+library(htmlTable)
+
+```
+
+Uncorrected results
+```{r xtable1, results="asis"}
+tab<-xtable(cbind("country"=table(brazil$country)))
+print(tab, type="html")
+```
+
+Corrected results
+
+```{r xtable2, results="asis"}
+brazil$country<-factor(brazil$country)
+tab<-xtable(cbind("country"=table(brazil$country)))
+print(tab, type="html")
+```
+
+
+### What is the status of Internet and social media
+
+Basic descriptives
+
+```{r internet1}
+table(brazil$internet)
+
+```
+
+**With xtables**
+
+***Table 4.2***
+```{r}
+
+tab<-cbind("internet"=table(brazil$internet))
+htmlTable(tab, rowlabel = "User status")
+
+
+```
+
+```{r internet2, results="asis"}
+tab<-xtable(cbind("internet"=table(brazil$internet)))
+print(tab, type="html")
+```
+
+**Adding more columns**
+
+
+```{r digital, results="asis"}
+tab<-xtable(cbind("internet"=table(brazil$internet),
+                  "email"=table(brazil$email),
+                  "social media"=table(brazil$social),
+                  "cell"=table(brazil$cell)
+                  ))
+print(tab, type="html")
+```
+
+```{r}
+library(htmlTable)
+tab<-xtable(cbind("internet"=table(brazil$internet),
+                  "email"=table(brazil$email),
+                  "social media"=table(brazil$social),
+                  "cell"=table(brazil$cell)
+                  ))
+htmlTable(tab, 
+          cgroup = c("internet & digital media users"), 
+          n.cgroup = c(4))
+
+```
+
+
+
+
+**Using sapply and function**
+
+***Table 4.3***
+
+```{r diginew, results="asis"}
+tab<-sapply(brazil[,3:6],function(x) table(x))
+htmlTable(tab, cgroup = c("internet & digital media users"), 
+          n.cgroup = c(4), rowlabel = "User status")
+```
+
+
+**Proportions**
+..
+
+***Table 4.4***
+```{r digital2, results="asis"}
+tab<-(cbind("internet"=table(brazil$internet),
+                  "email"=table(brazil$email),
+                  "social media"=table(brazil$social),
+                  "cell"=table(brazil$cell)
+                  ))
+
+tab1<- addmargins((prop.table(tab,2)*100),1)
+htmlTable(txtRound(tab1,1), cgroup = c("internet & digital media users"), 
+          n.cgroup = c(4), rowlabel = "User status")
+```
+
+
+**Proportions with sapply, and rounding the output**
+
+***Table 4.5***
+```{r propsapply, results="asis"}
+tab<-sapply(brazil[,3:6],function(x) table(x))
+tab1<- addmargins((prop.table(tab,2)*100),1)
+htmlTable(txtRound(tab1,0), cgroup = c("internet & digital media users"), 
+          n.cgroup = c(4), rowlabel = "User status")
+
+```
+
+
+**know your data**
+..
+*The question for social media is asked of those with internet*
+
+```{r social1, results = "asis"}
+tab1<-xtable(table(brazil$social, brazil$internet))
+print(tab1, type="html")
+tab2<-xtable(table(brazil$cell, brazil$internet))
+print(tab2, type="html")
+```
+
+```{r}
+tab1<-xtable(table(brazil$social, brazil$internet))
+htmlTable(tab1, 
+          cgroup = c("internet users"), n.cgroup = c(4),
+          rgroup=c("social media users"), n.rgroup=c(4))
+
+```
+
+```{r}
+tab1<-xtable(table(brazil$social, brazil$internet))
+htmlTable(tab1, 
+          cgroup = c("internet users"), n.cgroup = c(4),
+         rowlabel = "social media users")
+
+```
+
+
+**Cleaned data set without don't knows and refused**
+
+***Table 4.6***
+```{r digital3, results="asis"}
+tab<-(cbind("internet"=table(brazil$new.internet),
+                  "email"=table(brazil$new.email),
+                  "social media"=table(brazil$new.social),
+                  "cell"=table(brazil$new.cell)
+                  ))
+tab1<- addmargins((prop.table(tab,2)*100),1)
+htmlTable(txtRound(tab1,1), cgroup = c("internet & digital media users"), 
+          n.cgroup = c(4), rowlabel = "User status")
+```
+
+**Using the attach option**
+
+```{r attach}
+attach(brazil)
+```
+
+```{r digital3a, results="asis"}
+tab1<-(cbind("internet"=xtabs( ~ new.internet),
+                  "email"=xtabs(~new.email),
+                  "social media"=xtabs(~new.social),
+                  "cell"=xtabs(~new.cell)
+                  ))
+tab2<-xtable(tab1)
+print(tab2, type="html")
+tab3<- xtable(addmargins((prop.table(tab1,2)*100),1))
+print(tab3, type="html")
+```
+
+
+
+### Weighted data set using xtabs
+```{r digital4, results="asis"}
+tab1<-(cbind("internet"=xtabs(weight ~ new.internet),
+                  "email"=xtabs(weight~new.email),
+                  "social media"=xtabs(weight~new.social),
+                  "cell"=xtabs(weight~new.cell)
+                  ))
+tab2<-xtable(tab1)
+print(tab2, type="html")
+tab3<- xtable(addmargins((prop.table(tab1,2)*100),1))
+print(tab3, type="html")
+```
+
+
+
+**See the new command with digits=0 in the xtable command**
+
+***Table 4.7***
+```{r digital5, results="asis"}
+tab1<-(cbind("internet"=xtabs(weight ~ new.internet),
+                  "email"=xtabs(weight~new.email),
+                  "social media"=xtabs(weight~new.social),
+                  "cell"=xtabs(weight~new.cell)
+                  ))
+htmlTable(txtRound(tab1,0), cgroup = c("internet & digital media users"), 
+          n.cgroup = c(4), rowlabel = "User status")
+
+# tab3<- xtable(addmargins((prop.table(tab1,2)*100),1), digits=0)
+# print(tab3, type="html")
+```
+
+
+**With SAPPLY and weighted data set**
+
+
+***Table 4.8***
+
+```{r weightedsapply, results="asis"}
+tab1<-sapply(brazil[,14:17],function(x,y) xtabs(y ~ x), y=brazil[,13])
+tab2<-xtable(tab1, digits=0)
+print(tab2, type="html")
+
+tab3<- txtRound(addmargins((prop.table(tab1,2)*100),1),0)
+htmlTable(tab3, rowlabel = "User status")
+
+```
+
+Cross Tabulations
+------
+
+Using the recoded variables for income, gender, education and others.
+
+First the tabulating explanatory variables:
+
+**Gender**
+
+```{r gender, results="asis"}
+tab1<-cbind("Gender"=xtabs(weight ~ gender))
+tab2<-xtable(tab1, digits=0)
+print(tab2, type="html")
+```
+
+```{r gender2, results="asis"}
+tab1<-cbind("Gender"=xtabs(weight ~ gender+new.internet))
+tab2<-xtable(tab1, digits=0)
+print(tab2, type="html")
+
+tab3<-xtable(addmargins((prop.table(tab1,1)*100),2),digits=1)
+print(tab3, type="html")
+
+```
+
+***Table 4.9 and 4.10***
+```{r}
+tab1<-cbind(xtabs(weight ~ gender+new.internet))
+tab2<-txtRound(tab1, 0)
+htmlTable(tab2, 
+          cgroup = c("internet users"), n.cgroup = c(2),
+          rgroup=c("Gender"), n.rgroup=c(2))
+
+tab3<-addmargins((prop.table(tab1,1)*100),2)
+tab4<-txtRound(tab3,1)
+htmlTable(tab4, 
+          cgroup = c("internet users"), n.cgroup = c(3),
+          rowlabel = "Gender")
+
+```
+
+
+###Education###
+
+
+```{r edu1, results="asis"}
+tab1<-cbind("Education"=xtabs(weight ~ education))
+tab2<-xtable(tab1, digits=0)
+print(tab2, type="html")
+```
+
+
+```{r edu2, results="asis"}
+tab1<-cbind("Education"=xtabs(weight ~ education+new.internet))
+tab2<-xtable(tab1, digits=0)
+print(tab2, type="html")
+```
+
+***Table 4.11***
+```{r}
+tab1<-cbind("Education"=xtabs(weight ~ education+new.internet))
+tab2<-txtRound(addmargins((prop.table(tab1,1)*100),2),1)
+htmlTable(tab2, cgroup = c("internet users"), n.cgroup = c(3),
+          rowlabel = "Education attainment")
+```
+
+
+**Income**
+
+```{r inc1, results="asis"}
+tab1<-cbind("income"=xtabs(weight ~ income))
+tab2<-xtable(tab1, digits=0)
+print(tab2, type="html")
+```
+
+```{r inc2, results="asis"}
+tab1<-cbind("income"=xtabs(weight ~ income+new.internet))
+tab2<-xtable(tab1, digits=0)
+print(tab2, type="html")
+
+tab3<-xtable(addmargins((prop.table(tab1,1)*100),2),digits=1)
+print(tab3, type="html")
+
+```
+
+***Table 4.12***
+
+```{r}
+
+tab1<-cbind("Education"=xtabs(weight ~ income+new.internet))
+tab2<-txtRound(addmargins((prop.table(tab1,1)*100),2),1)
+htmlTable(tab2, cgroup = c("internet users"), n.cgroup = c(3),
+          rowlabel = "Income level")
+
+```
+
+**Age**
+
+```{r age1, results="asis"}
+tab1<-cbind("age"=xtabs(weight ~ new.age))
+tab2<-xtable(tab1, digits=0)
+print(tab2, type="html")
+```
+
+```{r age2, results="asis"}
+tab1<-cbind("age"=xtabs(weight ~ new.age+new.internet))
+tab2<-xtable(tab1, digits=0)
+print(tab2, type="html")
+
+tab3<-xtable(addmargins((prop.table(tab1,1)*100),2),digits=1)
+print(tab3, type="html")
+
+```
+
+***Table 4.13***
+
+```{r}
+tab1<-cbind("Age cohort"=xtabs(weight ~ new.age+new.internet))
+tab2<-txtRound(addmargins((prop.table(tab1,1)*100),2),1)
+htmlTable(tab2, cgroup = c("internet users"), n.cgroup = c(3),
+          rowlabel = "Age cohorts")
+
+```
+
+
+
+
+**Age + Gender**
+
+```{r age_gender}
+round(ftable(xtabs(weight~gender+new.age+new.internet)),0)
+```
+
+## Merging it all in a Binary Logit model
+
+**GLM.1 --> unweighted model GLM.2 --> weighted model**
+
+```{r, results='hide' }
+GLM.1 <- glm(new.internet ~ gender + new.age + new.cell + new.inc, family=binomial(logit), data=brazil)
+GLM.2 <- glm(new.internet ~ gender + new.age + new.cell + new.inc, family=binomial(logit), 
+    weights=weight, data=brazil)
+```
+
+```{r, results='asis'}
+
+logit1<-xtable(summary(GLM.1))
+print(logit1, type="html")
+
+logit2<-xtable(summary(GLM.2))
+print(logit2, type="html")
+
+expon<-cbind("unweighted model"=exp(coef(GLM.1)), "weighted model"=exp(coef(GLM.2)))
+print(xtable(expon,digits=3), type="html")
+```
+
+
+Stargazer with Brazil data
+===
+
+
+
+```{r, message=FALSE, echo=FALSE}
+library(stargazer)
+```
+
+## Merging it all in a Binary Logit model
+
+**GLM.1 --> unweighted model GLM.2 --> weighted model**
+
+```{r, temp1, results='hide' }
+GLM.1 <- glm(new.internet ~ gender + new.age + new.cell + new.inc, family=binomial(logit), data=brazil)
+GLM.2 <- glm(new.internet ~ gender + new.age + new.cell + new.inc, family=binomial(logit), 
+    weights=weight, data=brazil)
+```
+
+
+
+
+```{r, temp2, results='asis'}
+
+stargazer(GLM.1, GLM.2, type="html", align=TRUE, no.space=TRUE, 
+          dep.var.labels=c("Internet use (unweighted data), Internet use (weighted data)"),
+          covariate.labels=c("Female", "seniors","young adults", "youth", "own cell phone", 
+                             "low income hhld", "medium income hhld"))
+```
+
+
+

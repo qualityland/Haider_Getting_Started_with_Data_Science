@@ -1,0 +1,293 @@
+---
+title: "Chapter 8 Binary Logit"
+author: "Murtaza Haider"
+date: "January 24, 2016"
+output: html_document
+---
+
+###load data
+
+Data are downloaded, loaded, and names of fields are read from the file:
+
+```{r}
+setInternet2(TRUE) # solution for https files
+download.file("https://sites.google.com/site/econometriks/docs/R_smoking.rda", "R_smoking.rda")
+load("R_smoking.rda")
+
+names(smoking)
+```
+
+
+**Loading** required packages and **attaching** the data set.
+
+```{r}
+library(xtable)
+library(psych)
+attach(smoking)
+library(htmlTable)
+library(stargazer)
+```
+
+####Descriptive stats on continuous varaiables
+
+**Table 8.4**
+
+```{r, results='asis'}
+t1<-table(smoker)
+tab <- xtable(cbind(t1,'t1(%)'=t1/sum(t1)*100))
+htmlTable(txtRound(tab,2))
+
+```
+***
+
+**Table 8.5**
+```{r, results='asis'}
+
+smoking$smoker2<-factor(smoking$smoker)
+
+f1 <- function(x) c( mean=mean(x), sd= sd(x), obs=length(x))
+
+tab<-rbind(education=f1(educ),'age in years'=f1(age),
+      'household income'=f1(income), 
+       'cigarette price in cents'=f1(pcigs79),
+      'smoker' =f1(as.numeric(smoking$smoker2)-1))
+htmlTable(txtRound(tab,2))
+
+```
+
+...
+...
+
+**Descriptive statistics by smoker status**
+
+
+**Table 8.6**
+```{r, results='asis'}
+tab <- xtable(describeBy(cbind(educ, age, income, pcigs79), smoker, mat=T, skew=F, ranges=F))
+names(tab)[2] <-c( "smoker")
+print(tab, type="html")
+```
+
+***
+
+###Other versions of Table 8.6
+
+```{r, results='asis'}
+t1<-(aggregate(cbind(educ, age, income, pcigs79) ~ smoker, data=smoking,f1))
+htmlTable(txtRound(t(t1),2))
+
+
+t1<-aggregate(cbind(income,age, educ, pcigs79) ~ smoker, data=smoking, f1)
+tab<-xtable( as.matrix(t(t1)) )
+print(tab, type="html")
+```
+
+
+```{r, results='asis'}
+t1<-aggregate(cbind(income,age, educ, pcigs79) ~ smoker+1, data=smoking, f1)
+t2<-aggregate(cbind(income,age, educ, pcigs79) ~ 1, data=smoking, f1);
+
+t3<-as.matrix(t(t1))
+t4<-as.matrix(rbind("total",t(t2)))
+t5<-cbind(t3,t4)
+
+tab<-xtable(t5)
+print(tab, type="html")
+htmlTable(txtRound(t5,0,excl.rows=c(1:3,5,6,8,9,11,12)))
+
+```
+***
+
+##OLS model##
+
+**Table 8.7**
+
+```{r, results='asis'}
+ols.1<- lm((as.numeric(smoker)-1) ~ age +educ + pcigs79 +income,
+           data = smoking)
+ols.1a <- xtable(summary(ols.1))
+print(ols.1a, type="html") 
+
+ols.2<- lm((as.numeric(smoker)-1) ~ age +educ + pcigs79 +inc.10k)
+ols.2a <- xtable(summary(ols.2))
+print(ols.2a, type="html") 
+
+## Alternate version
+
+stargazer(ols.1,ols.2, type="html", align=TRUE, no.space=TRUE, 
+          digits=4, dep.var.labels=c("smoker"),
+          column.labels=c("income", "income/10k"),
+          covariate.labels=c("age in years", 
+                             "education in years",
+                             "price of a pack", "household income",
+                             "income in 10k"))
+
+```
+
+
+***
+
+
+##Logit models##
+
+**Table 8.9**
+
+```{r, results='asis'}
+GLM.1 <- glm(smoker ~ age +educ + pcigs79 + income, family=binomial(logit))
+coef.vector1 <-exp(GLM.1$coef)
+
+stargazer(GLM.1, type="html", align=TRUE, no.space=TRUE, 
+          digits=4, dep.var.labels=c("smoker"),
+          column.labels=c("income", "income/10k"),
+         covariate.labels=c("age in years", "education in years",
+                           "price of a pack", "household income"))
+```
+
+...
+
+
+**Exponentiated coefficients**
+**Table 8.10**
+
+```{r, results='asis'}
+GLM.1 <- glm(smoker ~ age +educ + pcigs79 + income, family=binomial(logit))
+coef.vector1 <-exp(GLM.1$coef)
+
+GLM.2 <- glm(smoker ~ age +educ + pcigs79 + inc.10k, family=binomial(logit))
+coef.vector2 <-exp(GLM.2$coef)
+
+stargazer(GLM.1, GLM.2, coef= list(coef.vector1, coef.vector2), 
+           digits=4, dep.var.labels=c("smoker"),
+          column.labels=c("income", "income/10k"), 
+          type="html",
+          covariate.labels=c("age in years", "education in years",
+                           "price of a pack", "household income",
+                           "income in 10k"))
+```
+
+
+
+** **
+
+##Probit models##
+
+
+**Figure 8.9**
+
+```{r}
+GLM.p<-(glm(smoker ~ age +educ + pcigs79 + inc.10k, data=smoking, family=binomial(probit)))
+summary(GLM.p)
+```
+
+***
+
+**Table 8.12**
+
+
+```{r, results='asis'}
+
+stargazer(ols.2, GLM.2,GLM.p, digits=4, dep.var.labels=c("smoker"),
+          type="html",
+          covariate.labels=c("age in years", 
+                             "education in years",
+                             "price of a pack", "income in 10k"))
+```
+
+#Zelig 
+
+## Figure 8.15, 8.16 and more
+
+```{r,message=FALSE,echo=FALSE}
+library(Zelig)
+```
+
+
+```{r, eval=T}
+z.out1 <- zelig(smoker ~ age + educ  + pcigs79 + income,
+                model = "logit", data = smoking)
+x.out1 <- setx(z.out1, age = 41.88414,  educ=12.19118, 
+               income = 19359.18, pcigs79 = 60.97193)
+s.out1 <- sim(z.out1, x = x.out1, num=100000)
+summary(s.out1)
+
+x.out2 <- setx(z.out1, age = 41.88414,  educ=12.19118, 
+               income = 19359.18, pcigs79 = 76.2149125)
+s.out2 <- sim(z.out1, x = x.out2, x1 = x.out1, num=100000)
+summary(s.out2)
+```
+
+```{r,fig.height=7, eval=T}
+plot(s.out1)
+plot(s.out2)
+```
+
+
+###Figures 8.16, 8.17 and 8.18
+
+```{r}
+library (erer)
+ma <- glm(smoker ~ age + educ + inc.10k + pcigs79, x = TRUE,
+data = smoking, family = binomial(link = "probit"))
+ea <- maBina(w = ma, x.mean = TRUE, rev.dum = TRUE)
+summary(ma)
+ea
+
+edu.1 <- maTrend(q = ea, nam.c="educ")
+plot(edu.1)
+```
+
+###Grouped Logit###
+
+```{r}
+
+download.file("https://sites.google.com/site/econometriks/docs/ny_grouped.rda", "ny_grouped.rda")
+load("ny_grouped.rda")
+
+attach(ny_grouped)
+```
+
+
+
+**Table 8.15**
+
+```{r, results='asis'}
+f1 <- function(x) c( mean=mean(x), sd= sd(x), obs=length(x))
+
+tab<-rbind("average autos/hhld"=f1(hh_autos),
+           'average persons/hhld'=f1(hh_size),
+      'distance from CBD'=f1(d_cbd), 
+       'total number of trips'=f1(n_trips),
+      'total transit trips' =f1(n_transit))
+htmlTable(txtRound(tab,2))
+
+```
+...
+
+**Figure 8.20 and Table 8.17**
+
+```{r, results='asis'}
+ny_grouped$non_transit <- with(ny_grouped, n_trips-n_transit)
+detach(ny_grouped)
+attach(ny_grouped)
+
+mod1 <- glm(cbind( n_transit, non_transit) ~ hh_autos + hh_size + 
+            d_cbd, data = ny_grouped,
+            family = binomial(link="logit"),trace=T)
+
+stargazer(mod1, type="html",
+          covariate.labels=c("avg. autos/hhld", "avg. persons/ hhld",
+                             "distance from cbd")) 
+```
+
+**Figure 8.19**
+
+```{r}
+
+res<-(data.frame("observed transit trips"=(ny_grouped$n_transit), "forecasted transit trips"=fitted(mod1)*ny_grouped$n_trips))
+
+head(res)
+plot(res)
+```
+
+
+

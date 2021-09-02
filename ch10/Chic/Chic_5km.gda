@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project>
+    <title>esri_Ch_CT</title>
+    <layers>
+        <layer>
+            <datasource>
+                <type>ESRI Shapefile</type>
+                <path>Chic_5km.shp</path>
+            </datasource>
+            <layername>Chic_nearCBD</layername>
+            <title/>
+            <variable_order>
+                <time_ids>
+                    <id>time 0</id>
+                </time_ids>
+                <var>ID</var>
+                <var>AREA</var>
+                <var>COLORING</var>
+                <var>TRACT</var>
+                <var>COUNTY</var>
+                <var>STATE</var>
+                <var>NAME</var>
+                <var>CMSA</var>
+                <var>POPULATION</var>
+                <var>HH_AUTOS</var>
+                <var>M_HHINC</var>
+                <var>SUBWAY_1</var>
+                <var>CT_DENS</var>
+                <var>BACHELORS</var>
+                <var>P_NOVEH</var>
+                <var>D_CBD</var>
+                <var>P_WORKERS</var>
+                <var>P_SINGMOM</var>
+                <var>RES_VALUE</var>
+                <var>P_RENTAL</var>
+                <var>P_VACANT</var>
+                <var>P_POVERTY</var>
+                <var>P_BLACK</var>
+                <var>P_WHITE</var>
+                <var>P_ASIAN</var>
+                <var>P_HISPANIC</var>
+                <var>P_UNEMPL</var>
+                <var>P_CHILDREN</var>
+                <var>M_RENT</var>
+                <var>HH_SIZE</var>
+                <var>P_TRANSIT</var>
+                <var>P_AUTO</var>
+                <var>P_WALK</var>
+                <var>N_TRIPS</var>
+                <var>N_TRANSIT</var>
+                <var>N_AUTO</var>
+                <var>N_WALK</var>
+                <var>M_COMMTIME</var>
+                <var>P_APMT</var>
+                <var>P_SINGDET</var>
+                <var>ENTROPY</var>
+                <var>P_OTHER</var>
+                <var>LT5KM</var>
+            </variable_order>
+            <custom_classifications/>
+            <spatial_weights/>
+            <default_vars>
+                <default_var>
+                    <name/>
+                    <time_id>time 0</time_id>
+                </default_var>
+                <default_var>
+                    <name/>
+                    <time_id>time 0</time_id>
+                </default_var>
+                <default_var>
+                    <name/>
+                    <time_id>time 0</time_id>
+                </default_var>
+                <default_var>
+                    <name/>
+                    <time_id>time 0</time_id>
+                </default_var>
+            </default_vars>
+        </layer>
+    </layers>
+</project>

@@ -1,0 +1,832 @@
+---
+title: "Hypothetically Speaking"
+author: "Murtaza Haider"
+date: "Sunday, January 05, 2016"
+output: html_document
+---
+
+
+
+### load the data set: TeachingRatings.rda
+
+```{r}
+setInternet2(TRUE) # solution for https files
+
+download.file("https://sites.google.com/site/statsr4us/intro/software/rcmdr-1/TeachingRatings.rda", "TeachingRatings.rda")
+
+load("TeachingRatings.rda")
+names(TeachingRatings)
+```
+
+
+```{r, echo=FALSE, message=FALSE}
+library(xtable)
+library(psych)
+
+
+```
+
+
+
+# Figure 6.1: Histogram of Appl returns
+```{r}
+library(quantmod)  ##  load the package "quantmod"
+getSymbols("AAPL") ##  get daily Apple stock data from Yahoo Finance
+dim(AAPL)          ##  find the sizes of the data downloaded
+
+getSymbols("AAPL",from="2011-01-01",to="2013-12-31")  ##  specify the data span
+y<-diff(log(AAPL$AAPL.Close))
+
+x1<-rbind(mean=mean(y, na.rm=T), sdev=sd(y, na.rm=T))
+colnames(x1)<-"descriptive stats" ; x1
+
+x <- coredata(y[-1,])
+
+h<-hist(x, breaks=20, col="dark grey", xlab="daily returns for Apple, 2011-2013",
+        main="Histogram with Normal Curve" ) 
+xfit<-seq(min(x),max(x),length=400) 
+yfit<-dnorm(xfit,mean=mean(x),sd=sd(x)) 
+yfit <- yfit*diff(h$mids[1:2])*length(x) 
+lines(xfit, yfit, col="black", lwd=2)
+
+
+```
+
+# Distributions
+
+### Fig. 6.6 Normal Distrinution
+
+```{r}
+x=seq(-4,4,length=200)
+y=1/sqrt(2*pi)*exp(-x^2/2)
+plot(x,y,type="l",lwd=2,col="dark grey")
+```
+
+
+### Comparing normal and t-distribution with varying degrees of freedom
+
+### Fig. 6.7
+```{r}
+
+# Display the Student's t distributions with various
+# degrees of freedom and compare to the normal distribution
+# http://www.statmethods.net/advgraphs/probability.html
+
+x <- seq(-4, 4, length=100)
+hx <- dnorm(x)
+
+degf <- c(1, 3, 8, 30)
+colors <- c("red", "blue", "darkgreen", "gold", "black")
+labels <- c("df=1", "df=3", "df=8", "df=30", "normal")
+
+plot(x, hx, type="l", lty=2, xlab="x value",
+  ylab="Density", main="Comparing t with normal distribution",
+  sub="adapted from http://www.statmethods.net/advgraphs/probability.html")
+
+for (i in 1:4){
+  lines(x, dt(x,degf[i]), lwd=2, lty=i+2, col=colors[i])
+}
+
+legend("topright", inset=.05, title="Distributions",
+  labels, lwd=2, lty=c(3,4,5,6,2), col=colors)
+```
+
+
+# Teaching Evaluations 
+
+
+#### Table 6.2 Summary Stats, teaching evaluations
+
+```{r, results='asis'}
+
+attach(TeachingRatings)
+
+tab <- xtable(describe(cbind(eval, age, beauty, students, allstudents), 
+                       skew=F, ranges=F))
+rownames(tab)<- c("teaching evaluation score", "instructor's age", "beauty score", 
+                  "students responding to survey","students registered in course")
+print(tab, type="html")
+```
+
+
+
+### Fig. 6.8 Histogram of teaching evaluation
+
+```{r}
+library(lattice)
+histogram(TeachingRatings$eval, nint=15, aspect=2, 
+          xlab="teaching evaluation score", col=c("dark grey"))
+```
+
+### Fig. 6.9: The normal curve for evaluations
+
+
+```{r}
+x=seq(1,7,length=200)
+y=dnorm(x,mean=3.998,sd=.554)
+plot(x,y,type="l",lwd=2,col="dark grey", main="Normal distribution",
+          xlab="teaching evaluation score", ylab= "density")
+          mtext("mean = 3.998, sd=0.554")
+
+```
+
+
+### Fig. 6.10: Histogram of normalized score
+```{r}
+z.eval<-as.matrix((TeachingRatings$eval-3.998)/.554)
+histogram(z.eval, nint=15, aspect=2, 
+          xlab="nomalized beauty score", col=c("dark grey"))
+
+```
+
+
+### F6.11: Prob > 4.5
+
+```{r}
+
+dnorm(4.5,mean=3.998,sd=.554)
+1-pnorm(4.5,mean=3.998,sd=.554)
+
+x=seq(1,7,length=200)
+y=dnorm(x,mean=3.998,sd=.554)
+plot(x,y,type="l",lwd=2,col="black",  main="Normal distribution",
+     sub="probability = 0.1824",
+          xlab="teaching evaluation score", ylab= "density")
+          mtext("probability of obtaining teching evaluation >4.5")
+ticks = c(4.5)
+axis(side = 1, at = ticks)
+x=seq(4.5,7,length=200)
+y=dnorm(x,mean=3.998,sd=.554)
+polygon(c(4.5,x,7),c(0,y,0),col="gray")
+
+```
+
+### F6.12 Prob <= 4.5
+
+```{r}
+dnorm(4.5,mean=3.998,sd=.554)
+pnorm(4.5,mean=3.998,sd=.554)
+
+x=seq(1,7,length=200)
+y=dnorm(x,mean=3.998,sd=.554)
+plot(x,y,type="l",lwd=2,col="black",  main="Normal distribution",
+     sub="probability = 0.8176",
+          xlab="teaching evaluation score", ylab= "density")
+          mtext("probability of obtaining teching evaluation < 4.5")
+ticks = c(4.5)
+axis(side = 1, at = ticks)
+x=seq(-7, 4.5,length=200)
+y=dnorm(x,mean=3.998,sd=.554)
+polygon(c(-7, x, 4.5),c(0,y,0),col="gray")
+```
+
+
+### F6.14: 3.5< Prob > 4.5
+
+
+```{r}
+
+pnorm(4.2,mean=3.998,sd=.554)-pnorm(3.5,mean=3.998,sd=.554)
+
+x=seq(2,6,length=200)
+y=dnorm(x,mean=3.998,sd=.554)
+plot(x,y,type="l",lwd=2,col="black",  main="Normal distribution",
+     sub="probability = 0.46",
+          xlab="teaching evaluation score", ylab= "density")
+          mtext("3.5 <= Teaching evaluation <= 4.2")
+ticks = c(3.5, 4.2)
+axis(side = 1, at = ticks, line =.8)
+x=seq(3.5, 4.2,length=200)
+y=dnorm(x,mean=3.998,sd=.554)
+polygon(c(3.5,x,4.2),c(0,y,0),col="gray")
+```
+
+
+# Basket Ball  
+
+
+
+
+```{r}
+setInternet2(TRUE) # solution for https files
+download.file("https://sites.google.com/site/econometriks/docs/basket.rda", "basket.rda")
+load("basket.rda")
+```
+
+### Fig. 6.15: Chamberlain and Jordan
+```{r}
+basket$player<-as.factor(basket$player)
+attach(basket) 
+
+tapply(PTS, player,mean);tapply(PTS, player,sd)
+
+x=seq(0,60,length=200)
+y=dnorm(x,mean=29.45,sd=4.764)
+plot(x,y,type="l",lwd=2,col="black", main="",
+     sub="", xlab="average points scored per game", ylab= "density")
+y=dnorm(x,mean=30.63,sd=10.59)
+lines(x,y,type="l",lwd=2,col="dark grey", main="",
+     sub="", xlab=" ", ylab= "")
+mtext("Michael \nJordan",1,line=-10,at=40,col="black")
+mtext("Wilt \nChamberlain",1,line=-6,at=10,col="blue")
+```
+
+
+
+## Figures 6.16-6.18: The rejection regions 
+
+```{r}
+
+##two tailed
+x=seq(-4,4,length=200)
+y=dnorm(x,mean=0,sd=1)
+plot(x,y,type="l",lwd=2,col="black", main="Two-tailed test",
+     sub="", xlab=" ", ylab= "density", xaxt="n")
+mtext("Normal distribution")
+axis(1, c(-4, -3, 0, 3,4), line=0); axis(1, c(-1.96, 1.96), line=0)
+
+x=seq(-4, -1.96, length=200)
+y=dnorm(x,mean=0,sd=1)
+polygon(c(-4,x,-1.96),c(0,y,0),col="gray")
+
+x=seq(1.96, 4, length=200)
+y=dnorm(x,mean=0,sd=1)
+polygon(c(1.96, x, 4),c(0,y,0),col="gray")
+
+##less than
+x=seq(-4,4,length=200)
+y=dnorm(x,mean=0,sd=1)
+plot(x,y,type="l",lwd=2,col="black", main="One-tailed test",
+     sub="", xlab=" ", ylab= "density", xaxt="n")
+mtext("Normal distribution, left sided")
+
+axis(1, c(-4, -3, 0, 3,4), line=0); axis(1, c(-1.64, 1.64), line=0)
+
+x=seq(-4, -1.64, length=200)
+y=dnorm(x,mean=0,sd=1)
+polygon(c(-4,x,-1.64),c(0,y,0),col="gray")
+
+
+
+##greater than
+x=seq(-4,4,length=200)
+y=dnorm(x,mean=0,sd=1)
+plot(x,y,type="l",lwd=2,col="black", main="One-tailed test",
+     sub="", xlab=" ", ylab= "density", xaxt="n")
+mtext("Normal distribution, right sided")
+axis(1, c(-4, -3, 0, 3,4), line=0); axis(1, c(-1.64, 1.64), line=0)
+
+x=seq(1.64, 4, length=200)
+y=dnorm(x,mean=0,sd=1)
+polygon(c(1.64, x, 4.5),c(0,y,0),col="gray")
+
+
+```
+
+
+
+### Fig. 6.19:  Central limit Theorem
+
+
+```{r}
+
+y=qt(.05, c(30,60,90, 200, 400, 500, 1000, 4000),lower.tail = T)
+x= c(30,60,90, 200, 400, 500, 1000, 4000)
+plot(x,y, pch=20, col="black", main="Critical values for t (lower tail)",
+     xlab="degrees of freedom", ylab="critical t values for 5%")
+y
+
+```
+
+
+# One sample, known population SDEV mean test
+
+-1.42>-1.96
+
+### Two-sided
+
+```{r}
+
+prob=pnorm(-1.96,mean=0,sd=1);prob*2
+
+prob=pnorm(10.7,mean=12,sd=5.5/sqrt(36));prob*2
+
+library(NCStats)
+z.test(10.7,mu = 12,sd = 5.5/sqrt(36),alternative = "two.sided")
+
+  
+xbar=10.7; sdev=5.5; mu=12; n=36
+z1<-(xbar-mu)/(sdev/sqrt(n));z1
+zvalue=round(z1,2);zvalue
+
+x=seq(-4,4,length=200)
+y=dnorm(x,mean=0,sd=1)
+plot(x,y,type="l",lwd=2,col="black", main="Comparison of mean test",
+     sub="", xlab=" ", ylab= "density")
+mtext("Normal distribution")
+x=seq(-4, -1.96, length=200)
+y=dnorm(x,mean=0,sd=1)
+polygon(c(-4,x,-1.96),c(0,y,0),col="gray")
+
+x=seq(1.96, 4, length=200)
+y=dnorm(x,mean=0,sd=1)
+polygon(c(1.96, x, 4),c(0,y,0),col="gray")
+
+x=seq(-4,zvalue, length=200)
+y=dnorm(x,mean=0,sd=1)
+polygon(c(-4,x, zvalue),c(0,y,0),col=, lwd=3)
+ticks = c(zvalue)
+axis(side = 1, at = ticks, line=0.3)
+
+## Axes and labels
+axis(1, -4:4, labels = round(-4:4*sdev/sqrt(n)+mu,3), line=3, 
+     col="blue",col.ticks="blue",col.axis="blue")
+
+axis(1, zvalue, labels = round(zvalue*sdev/sqrt(n)+mu,1), line=2.2, 
+     col="blue",col.ticks="blue",col.axis="blue")
+mtext("raw \ndata",1,line=3,at=-5,col="blue")
+mtext("normalized\ndata",1,line=1.3,at=-4.7,col="black")
+
+# LABELS
+mylabel2 = bquote(italic(z-value) == .(format(zvalue, digits = 3)))
+text(x = 3, y = .4, labels = mylabel2)
+mylabel3 = bquote(italic(p-value) == .(format(prob*2, digits = 5)))
+text(x = 3, y = .37, labels = mylabel3)
+```
+
+## The 95% region
+
+
+```{r}
+x=seq(-4,4,length=200)
+y=dnorm(x,mean=0,sd=1)
+plot(x,y,type="l",lwd=2,col="black", main="Comparison of mean test",
+     sub=" ", xlab=" ", ylab= "density")
+mtext("95% confidence interval")
+
+x=seq(-1.96, 1.96, length=200)
+y=dnorm(x,mean=0,sd=1)
+polygon(c(-1.96,x,1.96),c(0,y,0),col="gray")
+
+x=seq(-4,zvalue, length=200)
+y=dnorm(x,mean=0,sd=1)
+polygon(c(-4,x, zvalue),c(0,y,0),col=, lwd=3)
+
+ticks = c(zvalue)
+axis(side = 1, at = ticks, line=0.3)
+
+axis(1, -4:4, labels = round(-4:4*sdev/sqrt(n)+mu,3), line=3, 
+     col="blue",col.ticks="blue",col.axis="blue")
+
+axis(1, zvalue, labels = round(zvalue*sdev/sqrt(n)+mu,3), line=2.2, 
+     col="blue",col.ticks="blue",col.axis="blue")
+
+mtext("raw \ndata",1,line=3,at=-5,col="blue")
+mtext("normalized\ndata",1,line=1.3,at=-4.7,col="black")
+
+
+
+```
+
+### Fig. 6.23: Left sided
+
+```{r}
+xbar=6.5; sdev=1.5; mu=7; n=20
+
+
+prob=pnorm(xbar,mean=mu,sd=sdev/sqrt(n));prob
+z.test(xbar,mu = mu,sd = sdev/sqrt(n),alternative = "less")
+
+z1<-(xbar-mu)/(sdev/sqrt(n));z1
+zvalue=round(z1,2);zvalue
+
+x=seq(-4,4,length=200)
+y=dnorm(x,mean=0,sd=1)
+plot(x,y,type="l",lwd=2,col="black", main="Comparison of mean test",
+     sub="", xlab=" ", ylab= "density")
+mtext("one-tailed test")
+
+x=seq(-4, -1.64, length=200)
+y=dnorm(x,mean=0,sd=1)
+polygon(c(-4,x,-1.64),c(0,y,0),col="gray")
+
+x=seq(-4, zvalue, length=200)
+y=dnorm(x,mean=0,sd=1)
+polygon(c(-4, x, zvalue),c(0,y,0),col=, lwd=2)
+
+ticks = c(-1.64); axis(side = 1, at = ticks, line=.8)
+ticks = c(zvalue); axis(side = 1, at = ticks, line=.05)
+
+axis(1, -4:4, labels = round(-4:4*sdev/sqrt(n)+mu,2), line=3, 
+     col="blue",col.ticks="blue",col.axis="blue")
+
+axis(1, zvalue, labels = round(zvalue*sdev/sqrt(n)+mu,2), line=3, 
+     col="blue",col.ticks="blue",col.axis="blue")
+
+mtext("raw \ndata",1,line=3,at=-5,col="blue")
+mtext("normalized\ndata",1,line=1.3,at=-4.7,col="black")
+
+# LABELS
+mylabel2 = bquote(italic(z-value) == .(format(zvalue, digits = 3)))
+text(x = 3, y = .4, labels = mylabel2)
+mylabel3 = bquote(italic(p-value) == .(format(prob, digits = 5)))
+text(x = 3, y = .37, labels = mylabel3)
+
+```
+
+### Fig. 6.24: Right sided
+
+```{r}
+
+xbar=550; sdev=50; mu=500; n=5
+
+prob=pnorm(550,mean=500,sd=50/sqrt(5));1-prob
+ztest=z.test(550,mu = 500,sd = 50/sqrt(5),alternative = "greater");ztest
+plot(ztest)
+z1<-(xbar-mu)/(sdev/sqrt(n));z1
+zvalue=round(z1,2);zvalue
+
+x=seq(-4,4,length=200)
+y=dnorm(x,mean=0,sd=1)
+plot(x,y,type="l",lwd=2,col="black", main="Comparison of mean test",
+     sub="",  xlab=" ", ylab= "density")
+mtext("one-tailed, greater than test")
+
+x=seq(1.64, 4, length=200)
+y=dnorm(x,mean=0,sd=1)
+polygon(c(1.64, x, 4),c(0,y,0),col="gray")
+
+x=seq(zvalue, 4, length=200)
+y=dnorm(x,mean=0,sd=1)
+polygon(c(zvalue, x, 4),c(0,y,0),col=, lwd=3)
+
+ticks = c(zvalue, 1.64)
+axis(side = 1, at = ticks, line=.7)
+
+## Axes and labels
+axis(1, -4:4, labels = round(-4:4*sdev/sqrt(n)+mu,2), line=3, 
+     col="blue",col.ticks="blue",col.axis="blue")
+
+axis(1, zvalue, labels = round(zvalue*sdev/sqrt(n)+mu,2), line=-6, 
+     col="blue",col.ticks="blue",col.axis="blue")
+
+mtext("raw \ndata",1,line=3,at=-5,col="blue")
+mtext("normalized\ndata",1,line=1.3,at=-4.7,col="black")
+
+# LABELS
+mylabel2 = bquote(italic(z-test) == .(format(zvalue, digits = 3)))
+text(x = 3, y = .4, labels = mylabel2)
+mylabel3 = bquote(italic(p-value) == .(format(1-prob, digits = 5)))
+text(x = 3, y = .37, labels = mylabel3)
+```
+
+
+# T distribution 
+
+
+### Figure 6.25:Positive  Value, two-tailed test 
+
+```{r}
+xbar=170000; sdev=25000; mu1=166000; n1=35
+t.testx=(xbar-mu1)/(sdev/sqrt(n1)); t.testx
+prob=pt(t.testx,df=n1-1, lower.tail=F)
+pvalue=prob*2 # two tailed prob; 
+pvalue
+tvalue=round(t.testx,2);tvalue
+
+tcrit=abs(qt(0.05/2, n1-1)); tcrit ## two-sided critical t value
+
+x=seq(-4,4,length=200)
+y=dt(x,df=n1-1)
+plot(x,y,type="l",lwd=2,col="black", main="Comparison of mean test",
+     sub="", xlab=" ", ylab= "density")
+          mtext("t distribution")
+x=seq(-4, -tcrit, length=200)
+y=dt(x,df=n1-1)
+polygon(c(-4,x,-tcrit),c(0,y,0),col="gray")
+
+x=seq(tcrit, 4, length=200)
+y=dt(x,df=n1-1)
+polygon(c(tcrit, x, 4),c(0,y,0),col="gray")
+
+x=seq(tvalue, 4, length=200)
+y=dt(x,df=n1-1)
+polygon(c(tvalue, x, 4),c(0,y,0),col=, lwd=3)
+ticks = c(tvalue)
+axis(side = 1, at = ticks)
+
+axis(1, -4:4, labels = round(-4:4*sdev/sqrt(n)+mu1,0), line=3, 
+     col="blue",col.ticks="blue",col.axis="blue")
+
+axis(1, tvalue, labels = round(tvalue*sdev/sqrt(n)+mu1,0), line=.72, 
+     col="blue",col.ticks="blue",col.axis="blue")
+mtext("raw \ndata",1,line=3,at=-5,col="blue")
+mtext("normalized\ndata",1,line=1.3,at=-4.7,col="black")
+
+# LABELS
+mylabel1 = bquote(italic(dof) == .(format(n1-1, digits = 3)))
+text(x = 3, y = .4, labels = mylabel1)
+mylabel2 = bquote(italic(t-test) == .(format(tvalue, digits = 3)))
+text(x = 3, y = .37, labels = mylabel2)
+mylabel3 = bquote(italic(p-value) == .(format(pvalue, digits = 5)))
+text(x = 3, y = .34, labels = mylabel3)
+
+```
+
+
+
+## Evaluation and Gender
+
+### Table 6.5: 2-sample t-test example from t.test
+
+```{r}
+x=TeachingRatings
+
+t.mean<-tapply(x$eval,x$gender, mean)
+t.sd<- tapply(x$eval,x$gender, sd)
+round(cbind(mean=t.mean, s.dev=t.sd),2)
+```
+
+
+### Figure 6.26: 
+```{r}
+t2.ex <- t.test(eval~gender,var.equal = FALSE, data=x)
+t2.ex
+pt(c(3.267), df=425.76, lower.tail=F)*2
+plot(t2.ex)
+
+```
+ 
+
+### Fig. 6.27: positive value, two sided
+
+
+```{r}
+x=TeachingRatings
+t2 <- t.test(eval~gender,var.equal = FALSE, data=x); t2
+
+df.x=as.numeric(t2[2]); df.x
+tvalue=round(as.numeric(t2[1]),2);tvalue
+tcrit=abs(qt(0.05/2, df.x)); tcrit ## two-sided critical t value
+
+x=seq(-4,4,length=200)
+y=dt(x,df=df.x)
+plot(x,y,type="l",lwd=2,col="black", main="Comparison of mean test",
+     sub="", xlab=" ", ylab= "density")
+
+mtext("t distribution")
+
+x=seq(-4, -tcrit, length=200)
+y=dt(x,df=df.x)
+polygon(c(-4,x,-tcrit),c(0,y,0),col="gray")
+
+x=seq(tcrit, 4, length=200)
+y=dt(x,df=df.x)
+polygon(c(tcrit, x, 4),c(0,y,0),col="gray")
+
+x=seq(tvalue, 4, length=200)
+y=dt(x,df=df.x)
+polygon(c(tvalue, x, 4),c(0,y,0),lwd=3)
+ticks = c(tvalue)
+axis(side = 1, at = ticks)
+
+# LABELS
+mylabel1 = bquote(italic(dof) == .(format(df.x, digits = 5)))
+text(x = 3, y = .4, labels = mylabel1)
+mylabel2 = bquote(italic(t-test) == .(format(tvalue, digits = 3)))
+text(x = 3, y = .37, labels = mylabel2)
+mylabel3 = bquote(italic(p-value) == .(format(t2[3], digits = 3)))
+text(x = 3, y = .34, labels = mylabel3)
+
+```
+
+
+### Fig. 6.28: positive value, greater than
+
+```{r}
+x=TeachingRatings
+t2 <- t.test(eval~gender,var.equal = FALSE, data=x, alternative='greater');
+
+df.x=as.numeric(t2[2]); df.x
+tvalue=round(as.numeric(t2[1]),2);tvalue
+tcrit=abs(qt(0.05, df.x)); tcrit ## one-sided critical t value
+
+x=seq(-4,4,length=200)
+y=dt(x,df=df.x)
+plot(x,y,type="l",lwd=2,col="black", main="Comparison of mean test",
+     sub="", xlab=" ", ylab= "density")
+
+mtext("t distribution")
+
+x=seq(tcrit, 4, length=200)
+y=dt(x,df=df.x)
+polygon(c(tcrit, x, 4),c(0,y,0),col="gray")
+
+x=seq(tvalue, 4, length=200)
+y=dt(x,df=df.x)
+polygon(c(tvalue, x, 4),c(0,y,0),lwd=3)
+
+ticks = c(tvalue)
+axis(side = 1, at = ticks)
+ticks = c(round(tcrit,2))
+axis(side = 1, at = ticks, line=1)
+
+# LABELS
+mylabel1 = bquote(italic(dof) == .(format(df.x, digits = 5)))
+text(x = 3, y = .4, labels = mylabel1)
+mylabel2 = bquote(italic(t-test) == .(format(tvalue, digits = 3)))
+text(x = 3, y = .37, labels = mylabel2)
+mylabel3 = bquote(italic(p-value) == .(format(t2[3], digits = 3)))
+text(x = 3, y = .34, labels = mylabel3)
+
+
+```
+
+### Fig. 6.29: T - test output
+
+```{r}
+x=TeachingRatings
+t2 <- t.test(eval~gender,var.equal = FALSE, data=x, alternative='greater'); t2
+plot(t2)
+```
+
+### Fig. 6.30: positive value, two sided, UnEqual variances
+
+```{r}
+x=TeachingRatings
+t2 <- t.test(eval~gender,var.equal = T, data=x); t2
+```
+
+### Fig. 6.31: two tailed, equal variance
+
+```{r}
+x=TeachingRatings
+t2 <- t.test(eval~gender,var.equal = T, data=x); t2
+df.x=as.numeric(t2[2]); df.x
+tvalue=round(as.numeric(t2[1]),2);tvalue
+tcrit=abs(qt(0.05/2, df.x)); tcrit ## two-sided critical t value
+
+x=seq(-4,4,length=200)
+y=dt(x,df=df.x)
+plot(x,y,type="l",lwd=2,col="black", main="Comparison of mean test",
+     sub="", xlab=" ", ylab= "density")
+
+mtext("t distribution")
+
+x=seq(-4, -tcrit, length=200)
+y=dt(x,df=df.x)
+polygon(c(-4,x,-tcrit),c(0,y,0),col="gray")
+
+x=seq(tcrit, 4, length=200)
+y=dt(x,df=df.x)
+polygon(c(tcrit, x, 4),c(0,y,0),col="gray")
+
+x=seq(tvalue, 4, length=200)
+y=dt(x,df=df.x)
+polygon(c(tvalue, x, 4),c(0,y,0),lwd=3)
+ticks = c(tvalue)
+axis(side = 1, at = ticks)
+
+# LABELS
+mylabel1 = bquote(italic(dof) == .(format(df.x, digits = 5)))
+text(x = 3, y = .4, labels = mylabel1)
+mylabel2 = bquote(italic(t-test) == .(format(tvalue, digits = 3)))
+text(x = 3, y = .37, labels = mylabel2)
+mylabel3 = bquote(italic(p-value) == .(format(t2[3], digits = 3)))
+text(x = 3, y = .34, labels = mylabel3)
+
+```
+
+### Fig. 6.32: T-test: positive value, Greater, Equal variances
+
+```{r}
+x=TeachingRatings
+t2 <- t.test(eval~gender,var.equal = TRUE, data=x, alternative='greater'); t2
+```
+
+### Fig. 6.33: positive value, Greater, Equal variances
+
+```{r}
+x=TeachingRatings
+t2 <- t.test(eval~gender,var.equal = TRUE, data=x, alternative='greater'); t2
+
+df.x=as.numeric(t2[2]); df.x
+tvalue=round(as.numeric(t2[1]),2);tvalue
+tcrit=abs(qt(0.05, df.x)); tcrit ## two-sided critical t value
+
+x=seq(-4,4,length=200)
+y=dt(x,df=df.x)
+plot(x,y,type="l",lwd=2,col="black", main="Comparison of mean test",
+     sub="", xlab=" ", ylab= "density")
+
+mtext("t distribution")
+
+
+x=seq(tcrit, 4, length=200)
+y=dt(x,df=df.x)
+polygon(c(tcrit, x, 4),c(0,y,0),col="gray")
+
+x=seq(tvalue, 4, length=200)
+y=dt(x,df=df.x)
+polygon(c(tvalue, x, 4),c(0,y,0),lwd=3)
+
+ticks = c(tvalue)
+axis(side = 1, at = ticks)
+ticks = c(round(tcrit,2))
+axis(side = 1, at = ticks, line=1)
+
+# LABELS
+mylabel1 = bquote(italic(dof) == .(format(df.x, digits = 5)))
+text(x = 3, y = .4, labels = mylabel1)
+mylabel2 = bquote(italic(t-test) == .(format(tvalue, digits = 3)))
+text(x = 3, y = .37, labels = mylabel2)
+mylabel3 = bquote(italic(p-value) == .(format(t2[3], digits = 3)))
+text(x = 3, y = .34, labels = mylabel3)
+
+```
+
+## Worked out Example
+
+```{r}
+x1=110000;s1=5000; n1=65
+x2=125000;s2=15000; n2=45
+
+# Assuming equal variances
+vpool= (s1^2*(n1-1)+s2^2*(n2-1))/(n1+n2-2); vpool
+sdev = sqrt(vpool*(n1+n2)/(n1*n2)); sdev
+t = (x1-x2)/sdev ;t
+dof= n1+n2-2; dof
+```
+
+
+# Regression, Annova, Chisquare
+
+### Figures 6.35 and 6.36: Regression
+```{r}
+
+x<-TeachingRatings
+
+# Gender and eval
+x$gen2<-factor(x$gender, levels = c("female", "male"))
+cbind(mean.eval=tapply(x$eval, x$gen2,mean),observations=table(x$gen2))
+plot(x$gen2,x$eval, pch=20)
+
+# Fig. 6.35
+t2 <- t.test(eval~gender,var.equal = TRUE, data=x); t2
+
+# Fig. 6.36
+summary(lm(eval~gen2, data=x))
+```
+
+
+
+### Figures 6.37 and 6.38 Anova
+
+```{r}
+
+#age as a three factor
+x$f.age <- cut(x$age, breaks = 3)
+x$f.age <- factor(x$f.age,labels=c("young", "mid age", "old"))
+# plot(x$f.age,x$eval, pch=20)
+cbind(mean.eval=tapply(x$eval, x$f.age,mean),observations=table(x$f.age))
+# plot(x$age,x$eval,pch=20)
+
+# Fig. 6.37
+summary(lm(eval~f.age, data=x))
+
+# Fig. 6.38
+summary(aov(eval~f.age, data=x))
+```
+
+### Fig. 6.39, Annova with beauty
+```{r}
+## beauty
+x$f.beauty<-cut(x$beauty, breaks=3)
+x$f.beauty<-factor(x$f.beauty, labels=c("low beauty", "average looking", "good looking"))
+cbind(mean.eval=tapply(x$eval, x$f.beauty,mean),observations=table(x$f.beauty))
+
+# Fig. 6.39:
+summary(aov(eval~f.beauty, data=x))
+
+```
+
+
+
+### Fig. 6.40: CHI SQUARE
+
+```{r}
+t1<-table(x$gender,x$tenure);t1
+round(prop.table(t1,1)*100,2)
+chisq.test(t1, correct=F)
+
+r1<-margin.table(t1, 1) #  (summed over rows) 
+c1<-margin.table(t1, 2) #  (summed over columns)
+r1;c1
+
+e1<-r1%*%t(c1)/sum(t1);e1
+t2<-(t1-e1)^2/e1;t2;sum(t2)
+qchisq(.95, df = 1)
+1-pchisq(sum(t2),(length(r1)-1)*(length(c1)-1))
+
+```
+ 

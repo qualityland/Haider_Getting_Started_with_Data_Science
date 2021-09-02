@@ -1,0 +1,41 @@
+		(1)	(2)	(3)	(4)
+		multinomial logit dating brand			
+VARIABLES	LABELS	Match_com	eHarmony	OK_Cupid	Plenty_of_Fish
+					
+2o.sex	SEX. Respondent's sex = 2, omitted	-			
+					
+2o.community	community = 2, omitted	-			
+					
+3o.community	community = 3, omitted	-			
+					
+2o.par	PAR. Are you the parent or guardian of any children under age 18 now living in y = 2, omitted	-			
+					
+2o.email	EMLOCC. Do you send or receive email, at least occasionally? = 2, omitted	-			
+					
+2o.intmob	INTMOB. Do you access the internet on a cell phone, tablet or other mobile handh = 2, omitted	-			
+					
+2o.teletype	Sample type = 2, omitted	-			
+					
+o._cons		0			
+		(0)			
+2.sex	SEX. Respondent's sex = 2, female		0.0785	1.073	0.0383
+			(0.607)	(0.804)	(0.699)
+2.community	community = 2, suburban		0.342	0.401	0.0181
+			(0.923)	(1.544)	(0.955)
+3.community	community = 3, urban		0.344	2.425	-0.0362
+			(0.959)	(1.513)	(1.000)
+2.par	PAR. Are you the parent or guardian of any children under age 18 now living in y = 2, No		1.083	1.654	1.233
+			(0.729)	(1.154)	(0.847)
+2.email	EMLOCC. Do you send or receive email, at least occasionally? = 2, No		-14.24	2.282	-14.30
+			(1,922)	(1.683)	(2,267)
+2.intmob	INTMOB. Do you access the internet on a cell phone, tablet or other mobile handh = 2, No		0.596	-0.134	-0.599
+			(0.623)	(0.879)	(0.869)
+2.teletype	Sample type = 2, Cell		-0.481	1.771	-0.0597
+			(0.625)	(1.193)	(0.755)
+Constant	Constant		-1.981*	-6.376***	-2.129
+			(1.194)	(2.257)	(1.314)
+					
+Observations		89	89	89	89
+Pseudo R-squared		0.116	0.116	0.116	0.116
+Standard errors in parentheses					
+*** p<0.01, ** p<0.05, * p<0.1					

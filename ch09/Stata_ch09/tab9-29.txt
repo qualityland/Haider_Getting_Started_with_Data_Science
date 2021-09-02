@@ -1,0 +1,49 @@
+		(1)	(2)	(3)
+VARIABLES	LABELS	unemployed	part_time	full_time
+				
+unemployed				
+2o.hhi	hhi = 2, omitted	-		
+2o.education	education = 2, omitted	-		
+3o.education	education = 3, omitted	-		
+4o.education	education = 4, omitted	-		
+5o.education	education = 5, omitted	-		
+6o.education	education = 6, omitted	-		
+2o.race	race = 2, omitted	-		
+3o.race	race = 3, omitted	-		
+2o.hispanic	hispanic = 2, omitted	-		
+o.experience	experience = o,	-		
+o.exp2	exp2 = o,	-		
+o.exp3	exp3 = o,	-		
+o.kidslt6	kidslt6 = o,	-		
+o.kids618	kids618 = o,	-		
+o.husby	husby = o,	-		
+2o.region	region = 2, omitted	-		
+3o.region	region = 3, omitted	-		
+4o.region	region = 4, omitted	-		
+o._cons		0		
+part_time				
+2.hhi	hhi = 2, yes		6.659	-50.39***
+2.education	education = 2, 9-11years		24.43	18.00
+3.education	education = 3, 12years		131.4***	153.1***
+4.education	education = 4, 13-15years		206.3***	220.2***
+5.education	education = 5, 16years		206.7***	300.6***
+6.education	education = 6, >16years		293.4***	566.9***
+2.race	race = 2, black		-15.76*	71.95***
+3.race	race = 3, other		-41.39	-16.39
+2.hispanic	hispanic = 2, yes		-36.65***	-28.51***
+experience	experience		0.737	11.23***
+exp2	exp2		-5.680	-37.61***
+exp3	exp3		-0.110	0.245**
+kidslt6	kidslt6		-44.76***	-67.17***
+kids618	kids618		-4.739**	-32.30***
+husby	husby		-0.442***	-0.505***
+2.region	region = 2, northcentral		3.293	12.19**
+3.region	region = 3, south		-39.94***	-7.735*
+4.region	region = 4, west		-20.94***	-15.16***
+full_time				
+Constant	Constant		-22.24	159.1***
+				
+Observations		22,272	22,272	22,272
+Pseudo R-squared		0.118	0.118	0.118
+Standard errors in parentheses				
+*** p<0.01, ** p<0.05, * p<0.1				

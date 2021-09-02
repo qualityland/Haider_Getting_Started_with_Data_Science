@@ -1,0 +1,130 @@
+---
+title: "Discrete Choice models"
+author: "Murtaza Haider"
+date: "Monday, October 20, 2014"
+output: html_document
+---
+
+```{r}
+
+setInternet2(TRUE) # solution for https files
+download.file("https://sites.google.com/site/econometriks/docs/h09.rda", "h09.RData")
+load("h09.RData")
+
+```
+
+
+
+```{r, message=FALSE}
+library(mlogit)
+library(psych)
+library(xtable)
+library(htmlTable)
+names(h09)
+attach(h09)
+
+```
+
+```{r, results='asis'}
+
+h09a <- h09[ which(mc== "yes"),]
+detach(h09)
+tab1<-table(h09a$alt); tab2<-tab1/sum(tab1)*100
+print(xtable(cbind("mode share (%)"= tab2)), type="html")
+tab3=xtable(cbind(tab2))
+htmlTable(txtRound(tab3,2), rowlabel = "mode of travel",
+          header ="percentage of respondents")
+
+
+attach(h09a)
+tab3<-describeBy(cbind(twait, invc, invt, hinc, psize), alt, mat=TRUE , range=F, skew=F)
+print(xtable(tab3, digits=c(0,0,0,0,0,2,2,2)), type="html")                 
+detach(h09a)
+
+```
+
+
+****
+
+
+```{r, results='asis'}
+data1 <- mlogit.data (h09,choice="mc",shape="long",id.var="id", 
+        alt.var= "alt")
+        
+mod.1<-mlogit(mc~ gc + twait +hinca  ,data1,reflevel="car")
+mod.2<-mlogit(mc~ gc + twait +hinca  ,data1,reflevel="air")
+
+fit1<-fitted(mod.2,outcome=F)
+```
+
+```{r, results='asis'}
+library(stargazer)
+stargazer(mod.1, mod.2,  type="html", no.space=TRUE, 
+          dep.var.labels = c("travel mode choice"), 
+          title="Discrete Choice Models", covariate.labels = c("air intercept",
+          "bus intercept", "car intercept", "train intercept", "generalized cost",
+          "terminal wait times", "household income (air only)") )
+
+
+tab1<-describe(fit1, skew=F, range=F)
+
+print(xtable(tab1, digits=c(0,0,0,2,2,2)), type="html")
+```
+
+
+****
+
+
+
+
+```{r, eval=FALSE}
+names(h09)[1]<-"person id"
+names(h09)[2]<-"alternatives"
+names(h09)[3]<-"air ones"
+names(h09)[4]<-"household income ('000)"
+names(h09)[5]<-"party size"
+names(h09)[6]<-"air ASC"
+names(h09)[7]<-"train ASC"
+names(h09)[8]<-"bus ASC"
+names(h09)[9]<-"car ASC"
+names(h09)[10]<-"party size- air"
+names(h09)[11]<-"chosen mode"
+names(h09)[12]<-"wait time"
+names(h09)[13]<-"in-vehicle cost"
+names(h09)[14]<-"in-vehicle time"
+names(h09)[15]<-"generalized cost"
+names(h09)[16]<-"binary choice"
+names(h09)[17]<-"income-air"
+names(h09)[18]<-"income-bus"
+names(h09)[19]<-"inc-train"
+names(h09)[20]<-"party size-bus"
+names(h09)[21]<-"party size-train"
+names(h09)[22]<-"dummy t"
+names(h09)[23]<-"numeric choice"
+```
+
+
+
+```{r, eval=FALSE}
+w.air = .14/.28
+w.train = .13/.3
+w.bus = .09/.14
+w.car = .64/.28
+
+attach(h09)
+h09$wts[alt=="air"] <-w.air
+h09$wts[alt=="train"] <-w.train
+h09$wts[alt=="bus"] <-w.bus
+h09$wts[alt=="car"] <-w.car
+
+data2 <- mlogit.data (h09,choice="mc",shape="long",id.var="id", 
+        alt.var= "alt")
+summary(mod2<-mlogit(mc~ gc + twait +hinca  ,data2, weights=wts, reflevel="car"))
+summary(mod2<-mlogit(mc~ gc + twait +hinca  ,data2, reflevel="car"))
+
+aggregate( wts, by=list(alternatives=alt), data = h09, mean)
+
+```
+
+
+

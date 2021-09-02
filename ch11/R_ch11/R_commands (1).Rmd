@@ -1,0 +1,69 @@
+---
+output: word_document
+---
+Pak Terror Trade
+========================================================
+
+
+
+```{r}
+library(foreign)
+library(tseries)
+```
+
+Import Data sets
+
+```{r,eval=FALSE}
+pak <-   read.dta("H:/Research/Projects/Pakistan/Pak_terror_trade/April2014/data-results/Data_April2014_From Amar/R/data.dta", convert.dates=TRUE, convert.factors=TRUE, missing.type=TRUE,   convert.underscore=TRUE, warn.missing.labels=TRUE)
+
+
+## save("pak",   file="H:/Research/Projects/Pakistan/Pak_terror_trade/April2014/data-results/Data_April2014_From Amar/R/pak.RData")
+```
+
+```{r}
+load("J:/Research/Projects/Pakistan/Pak_terror_trade/April2014/data-results/Data_April2014_From Amar/R/pak.RData")
+
+```
+
+```{r}
+data1 <- ts(pak[,2:13], start = c(2001, 1), frequency = 12)
+data2<-as.data.frame(data1)
+```
+
+```{r}
+acf(data2[,2],na.action=na.pass)
+pacf(data2[,2],na.action=na.pass)
+```
+
+```{r}
+library(forecast)
+fit <- auto.arima(data2[,2])
+summary(fit)
+plot(forecast(fit,h=20))
+
+```
+
+```{r}
+summary(arima(data2[,2], order= c(2,1,0)))
+tsdiag(fit)
+```
+
+Dickey Fuller Test
+```{r}
+adf.test(na.omit(data2[,2]))
+adf.test(na.omit(diff(data2[,2])))
+```
+
+```{r}
+fdi<-na.omit(data2[,1:2])
+auto.arima(fdi[,2], xreg=fdi[,1])
+```
+
+
+```{r, eval=FALSE}
+mod1<-arima(fdi[,2], order = c(0,1,1), xreg=fdi[,1])
+summary(mod1)
+forecast(mod1,h=2)
+```
+
+

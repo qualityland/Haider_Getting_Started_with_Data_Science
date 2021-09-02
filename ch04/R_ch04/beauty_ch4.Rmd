@@ -1,0 +1,351 @@
+---
+title: "Beauty, Chapter 4"
+author: "Murtaza Haider"
+date: "August 27, 2014, revised Jan. 05, 2016"
+output: html_document
+---
+
+
+##Download data
+
+**Downloading** data from the website. The download command downloads data in the working directory.
+
+Data are downloaded, loaded, and names of fields are read from the file:
+
+```{r}
+setInternet2(TRUE) # solution for https files
+
+download.file("https://sites.google.com/site/statsr4us/intro/software/rcmdr-1/TeachingRatings.rda", "TeachingRatings.rda")
+
+load("TeachingRatings.rda")
+
+setwd("C:/Users/Murtaza/Google Drive/AEBE/Data/ch.04/R_ch04")
+
+names(TeachingRatings)
+```
+
+**Loading** required packages and **attaching** the data set.
+
+```{r}
+library(xtable)
+library(psych)
+library(htmlTable)
+attach(TeachingRatings)
+```
+
+####Descriptive stats on continuous varaiables
+
+***TAble 4-18***
+
+```{r, results='asis'}
+
+tab <- xtable(describe(cbind(age, beauty, eval, students, allstudents), 
+                       skew=F, ranges=T))
+print(tab, type="html")
+
+```
+** **
+
+**Subset data by professors**
+
+Professor specific variables:
+
+- age
+- beauty
+
+
+***Identifying duplicates for subsetting***
+
+
+```{r}
+profs <- subset(TeachingRatings, !duplicated(TeachingRatings$prof))
+```
+
+
+```{r, warning=FALSE, message=FALSE}
+attach(profs)
+```
+
+**Descriptive statistics**
+
+
+***Table 4-19***
+```{r, results='asis'}
+tab <- xtable(describe(cbind(age, beauty), skew=F, ranges=F))
+print(tab, type="html")
+
+```
+
+****
+
+**Evaluation Factors:**
+
+
+- minority 
+- Gender 
+- Native 
+- Tenure 
+
+
+```{r, warning=FALSE, message=FALSE}
+attach(TeachingRatings)
+```
+
+#### Average evaluation by gender 
+
+
+**psych package**
+
+***Table 4-20***
+
+```{r, results='asis'}
+tab <- xtable(describeBy(eval, gender, mat=T, skew=F, ranges=T))
+print(tab, type="html")
+
+```
+****
+
+
+
+```{r xtable1, results="asis"}
+tab<-xtable(cbind("Teaching Evaluations"=tapply(eval, gender, mean)))
+print(tab, type="html")
+```
+
+
+#### Average evaluation by tenure 
+
+***Table 4-21***
+
+```{r}
+tab<-cbind("Teaching Evaluations"=tapply(eval, tenure, mean))
+htmlTable(txtRound(tab,2),rowlabel = "Tenure status")
+
+```
+
+
+```{r xtable2, results="asis"}
+tab<-xtable(cbind("Teaching Evaluations"=tapply(eval, tenure, mean)))
+print(tab, type="html")
+```
+
+#### Average evaluation by tenure and gender
+
+***Table 4-22***
+
+```{r}
+tab<-cbind("Teaching Evaluation"=tapply(eval, list(tenure, gender), mean))
+
+htmlTable(txtRound(tab,2), 
+          cgroup = c("Gender"), n.cgroup = c(2),
+          rowlabel = "Tenure Status")
+
+```
+
+
+
+****
+***Table 4-23 and 4-24***
+
+```{r}
+f <- function(x) c(obs=length(x), mean=mean(x), sd=sd(x))
+tres<-as.matrix(aggregate(eval ~ gender+tenure, FUN=c("f")))
+htmlTable(txtRound(tres,0,excl.cols = c(1,2,4,5)))
+
+colnames(tres)[3:5]<-c("n", "mean", "std. dev.")
+htmlTable(txtRound(tres,0,excl.cols = c(1,2,4,5)))
+```
+
+
+#### Average evaluation by tenure, gender, and minority
+
+***Table 4-25***
+
+```{r}
+f <- function(x) c(obs=length(x), mean=mean(x), sd=sd(x))
+tres<-as.matrix(aggregate(eval ~ gender+tenure+minority, FUN=c("f")))
+colnames(tres)[4:6]<-c("n", "mean", "std. dev.")
+htmlTable(txtRound(tres,0,excl.cols = c(1,2,3,5,6)))
+```
+
+
+
+**Summarising eval and beauty by gender**
+
+***Table 4-26***
+```{r}
+f <- function(x) c(obs=length(x), mean=mean(x), sd=sd(x))
+tres<-t(as.matrix(aggregate(cbind(eval, beauty) ~ gender, FUN=c("f"))))
+rownames(tres)[2:7]<-c("n", "mean", "std. dev.", "n", "mean", "std. dev.")
+htmlTable(txtRound(tres,0, excl.rows = c(3,4,6,7)),
+          rgroup=c("","evaluation score","beauty score"),
+          n.rgroup = c(1,3,3))
+```
+
+
+#### Average evaluation by minority
+
+```{r xtable4, results="asis"}
+tab<-xtable(cbind("Teaching Evaluation"=tapply(eval, minority, mean)))
+print(tab, type="html")
+```
+
+
+
+****
+#### Average evaluation by native English speaking
+
+```{r xtable6, results="asis"}
+tab<-xtable(cbind("Teaching Evaluation"=tapply(eval, native, mean)))
+print(tab, type="html")
+```
+..
+
+
+
+
+
+#### Correlation between beauty and evaluation
+
+***Table 4-27***
+
+```{r, results='asis' }
+
+myvars<- c("eval", "beauty", "age", "students", "allstudents")
+x <- TeachingRatings[myvars]
+tab <-xtable(cor(x), digits=3)
+print(tab, type="html")
+```
+
+
+
+
+****
+
+##Reproducing Table 1 from Hamermesh paper
+
+
+**Generate SD Function**
+```{r}
+my.wsd<-  function(w, x, wx, n)  sqrt(sum(w*(x-wx)^2)/((n-1)*sum(w)/n))
+```
+
+
+
+**Generate Percent evaluating**
+
+```{r}
+TeachingRatings$p.eval <- students/allstudents*100 
+```
+
+**All Results**
+
+```{r, warning=FALSE, message=FALSE}
+attach(TeachingRatings)
+
+
+```
+
+```{r}
+
+wm.course <-weighted.mean(eval,students); wm.course
+wsd.course<-my.wsd(students,eval, wm.course, length(eval)) ; wsd.course
+m.studs <- mean(allstudents); sd.studs <-sd(allstudents); m.studs
+m.peval <-mean(p.eval); m.peval
+
+tabgen<-xtabs(students~gender)/sum(students); tabgen
+tabmin<-xtabs(students~minority)/sum(students); tabmin
+tabeng<-xtabs(students~native)/sum(students); tabeng
+tabten<-xtabs(students~tenure)/sum(students); tabten
+tabdiv<-table(division)/sum(table(division)); tabdiv
+tabmin<-xtabs(students~minority)/sum(students); tabmin
+courses <- length(eval); courses
+faculty <- length(unique(prof)); faculty
+
+all.res<- rbind(wm.course, wsd.course, m.studs, sd.studs, m.peval, female=tabgen[2],
+      minority=tabmin[2], 'native english' =tabeng[2], tenure = tabten[2],
+      "lower division" = tabdiv[2], courses, faculty); all.res
+
+colnames(all.res) <- "all courses"; all.res
+```
+
+****
+
+
+**Subset Lower**
+
+```{r, warning=FALSE, message=FALSE}
+lower <- subset(TeachingRatings, subset=division =="lower")
+attach(lower)
+```
+
+```{r}
+
+wm.course <-weighted.mean(eval,students); wm.course
+wsd.course<-my.wsd(students,eval, wm.course, length(eval)) ; wsd.course
+m.studs <- mean(allstudents); sd.studs <-sd(allstudents); m.studs
+m.peval <-mean(p.eval); m.peval
+
+tabgen<-xtabs(students~gender)/sum(students); tabgen
+tabmin<-xtabs(students~minority)/sum(students); tabmin
+tabeng<-xtabs(students~native)/sum(students); tabeng
+tabten<-xtabs(students~tenure)/sum(students); tabten
+tabdiv<-table(division)/sum(table(division)); tabdiv
+tabmin<-xtabs(students~minority)/sum(students); tabmin
+courses <- length(eval); courses
+faculty <- length(unique(prof)); faculty
+
+lower.res<-rbind(wm.course, wsd.course, m.studs, sd.studs, m.peval, female=tabgen[2],
+      minority=tabmin[2], 'native english' =tabeng[2], tenure = tabten[2],
+      "lower division" = tabdiv[2], courses, faculty); lower.res
+
+colnames(lower.res) <- "lower division"; lower.res
+
+```
+
+****
+
+**Subset Upper**
+
+```{r, warning=FALSE, message=FALSE}
+
+upper <- subset(TeachingRatings, subset=division =="upper")
+
+attach(upper)
+
+wm.course <-weighted.mean(eval,students); wm.course
+wsd.course<-my.wsd(students,eval, wm.course, length(eval)) ; wsd.course
+m.studs <- mean(allstudents); sd.studs <-sd(allstudents); m.studs
+m.peval <-mean(p.eval); m.peval
+
+tabgen<-xtabs(students~gender)/sum(students); tabgen
+tabmin<-xtabs(students~minority)/sum(students); tabmin
+tabeng<-xtabs(students~native)/sum(students); tabeng
+tabten<-xtabs(students~tenure)/sum(students); tabten
+tabdiv<-table(division)/sum(table(division)); tabdiv
+tabmin<-xtabs(students~minority)/sum(students); tabmin
+courses <- length(eval); courses
+faculty <- length(unique(prof)); faculty
+
+upper.res<-rbind(wm.course, wsd.course, m.studs, sd.studs, m.peval, female=tabgen[2],
+      minority=tabmin[2], 'native english' =tabeng[2], tenure = tabten[2],
+      "lower division" = tabdiv[2], courses, faculty);upper.res
+
+colnames(upper.res) <- "upper division" ; upper.res
+
+```
+
+
+****
+
+**Final Table**
+
+```{r, results='asis'}
+tab <-xtable(cbind(all.res, lower.res, upper.res), digits=3)
+print(tab, type="html")
+```
+
+****
+
+- 
+

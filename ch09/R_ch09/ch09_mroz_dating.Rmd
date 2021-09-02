@@ -1,0 +1,491 @@
+---
+title: "Chapter 9: Multinomial logit models"
+author: "Murtaza Haider"
+date: "Thursday, October 02, 2014"
+output: html_document
+---
+
+
+##Mroz data
+
+Load the data set
+```{r}
+data(Mroz, package="car")
+attach(Mroz)
+```
+
+```{r}
+library(stargazer)
+library(xtable)
+library(htmlTable)
+```
+****
+
+```{r,results='asis'}
+stargazer(Mroz, type="html")
+```
+
+****
+**Cross-Tabulations**
+
+```{r,results='asis'}
+t1=table(lfp);t2=t1/sum(t1)*100
+t3=rbind("in labour force (N)"=t1,"in labour force (%)"=round(t2,1))
+tab<-xtable(t3, digits=1); print(tab, type="html")
+htmlTable(txtRound(tab,0), rowlabel = "labour force participation")
+
+chitest=xtabs(~ lfp+wc); print(xtable(chitest, digits=0), type="html")
+chisq.test(chitest)
+
+t4<-prop.table(chitest,2)*100 
+t5<- cbind(chitest, t4)
+
+rownames(t5)<- c( "did not participate in labor force", "participated in labor force")
+colnames(t5)<-c("wife didn't attend college (N)", "wife attended college (N)", "wife didn't attend college (%)", "wife attended college (%)")
+
+htmlTable(txtRound(t5,0), rowlabel = "labour force participation")
+
+```
+****
+
+```{r,results='asis'}
+chitest=xtabs(~ lfp+hc); print(xtable(chitest, digits=0), type="html")
+chisq.test(chitest)
+
+rownames(chitest)<- c( "did not participate in labor force", "participated in labor force")
+colnames(chitest)<-c("husband didn't attend college (N)", "husband attended college (N)")
+
+htmlTable(txtRound(chitest,0), rowlabel = "wife's labour force participation")
+
+```
+
+****
+
+
+
+
+####Descriptive Stats before the labour force model
+
+```{r, results='asis'}
+
+t1<- xtabs(~ k5 + lfp); t.k5 = prop.table(t1,1)*100
+t1<- xtabs(~ k618 + lfp); t.k618 = prop.table(t1,1)*100
+t.age<- tapply(age, lfp,mean)
+t1<- xtabs(~ wc + lfp);  t.wc = prop.table(t1,1)*100
+t1<- xtabs(~ hc + lfp);  t.hc = prop.table(t1,1)*100
+t.wifelogwage<- tapply(lwg, lfp,mean)
+t.faminc<- tapply(inc, lfp,mean)
+t5<-rbind(t.k5, t.k618, t.age, t.wc, t.hc, t.wifelogwage, t.faminc)
+t5<-round(t5,2)
+
+colnames(t5)<- c("not working", "working")
+rownames(t5)<-paste(c("no child", "1 child", paste0(2:3, " children"), "no child", "1 child", paste0(2:8, " children"),
+                    "wife's age", "college educated",
+                    "did not attend college", 
+                    "college educated",
+                    "did not attend college",
+                    "log of wife's wages",
+                    "family income excluding wife's"))
+
+htmlTable( txtRound(t5,0, excl.rows = c(14,19,20)),
+          rgroup=c("children under 6 (%)",
+                   "children 6-18 years (%)",
+          "wife's age in years", "wife's education (%)",
+          "husband's education (%)", "wife's income",
+          "family income ('000s)"),
+          n.rgroup = c(4,9,1,2,2,1,1),
+          cgroup = c("Wife's labor force participation"),
+          n.cgroup = c(2),
+          rowlabel="Demographic attributes")
+
+```
+
+
+##Older version
+
+```{r, results='asis'}
+names(Mroz)
+attach(Mroz)
+
+t1<- xtabs(~ k5 + lfp); t1; t.k5 = prop.table(t1,1)*100
+t1<- xtabs(~ k618 + lfp); t1; t.k618 = prop.table(t1,1)*100
+t.age<- tapply(age, lfp,mean)
+t1<- xtabs(~ wc + lfp); t1; t.wc = prop.table(t1,1)*100
+t1<- xtabs(~ hc + lfp); t1; t.hc = prop.table(t1,1)*100
+t.wifelogwage<- tapply(lwg, lfp,mean)
+t.faminc<- tapply(inc, lfp,mean)
+t5<-rbind(t.k5, t.k618, t.age, t.wc, t.hc, t.wifelogwage, t.faminc)
+
+colnames(t5)<- c("not working", "working")
+rownames(t5)[1]<- c( "kids under 6 [0 child]")
+rownames(t5)[2]<- c( "kids under 6 [1]") ; rownames(t5)[3]<- c( "kids under 6 [2]")
+rownames(t5)[4]<- c( "kids under 6 [3]"); rownames(t5)[5]<- c( "kids 6 to 18 years [0 child]")
+rownames(t5)[6]<- c( "kids 6 to 18 years [1]"); rownames(t5)[7]<- c( "kids 6 to 18 years [2]")
+rownames(t5)[8]<- c( "kids 6 to 18 years [3]"); rownames(t5)[9]<- c( "kids 6 to 18 years [4]")
+rownames(t5)[10]<- c( "kids 6 to 18 years [5]"); rownames(t5)[11]<- c( "kids 6 to 18 years [6]")
+rownames(t5)[12]<- c( "kids 6 to 18 years [7]"); rownames(t5)[13]<- c( "kids 6 to 18 years [8]")
+rownames(t5)[14]<- c( "wife's age"); rownames(t5)[15]<- c( "wife's college edu (no)")
+rownames(t5)[16]<- c( "wife's college edu (yes)"); rownames(t5)[17]<- c( "husband's college edu (no)")
+rownames(t5)[18]<- c( "husband's college edu (yes)")
+rownames(t5)[19]<- c( "log of wife's wages)"); rownames(t5)[20]<- c( "family income excluding wife's")
+#t5
+print(xtable(t5, digits=1), type="html")
+```
+
+
+****
+###Labour force participation model
+
+```{r}
+
+library(MASS)
+library(nnet)
+
+
+lab.for <- glm(lfp ~ k5 + k618 + age+ wc + hc + lwg +inc, data=Mroz, 
+               family = binomial(link = "logit"))
+
+```
+
+```{r,results='asis'}
+
+stargazer(lab.for, type="html", align=TRUE, keep.stat = c("n","ll", "aic"), 
+          dep.var.labels=c("labour force participation"), no.space=TRUE, 
+          covariate.labels = c("kids under 6", "kids 6 to 18", "wife's age", "wife attended college", "husband attended college", "log of wife's estimated wages", "family income excluding wife's"))
+
+#  EXPONENTIAL COEFFICIENTS
+stargazer(cbind(exp(coef(lab.for))), type="html")
+```
+
+
+****
+
+####McFadden's R Square
+
+```{r}
+ll0 <- glm(lfp ~ 1 , data=Mroz, family = binomial(link = "logit"))
+x2<-as.numeric(logLik(ll0)); x1<-as.numeric(logLik(lab.for))
+McFaddenR<-1-(x1/x2)
+McFaddenR
+```
+
+
+
+****
+
+##Pew Dating Data
+
+**Downloading** data from the website. The download command downloads data in the working directory.
+
+Data are downloaded, loaded, and names of fields are read from the file:
+
+```{r}
+setInternet2(TRUE) # solution for https files
+download.file("https://sites.google.com/site/econometriks/docs/dating.RData", "dating.RData")
+load("dating.RData")
+
+```
+
+
+**Loading** required packages and **attaching** the data set.
+
+```{r}
+library(xtable)
+library(psych)
+# names(dating)
+attach(dating)
+```
+
+
+**load packages for model estimation**
+
+```{r}
+library(nnet)
+library(lmtest)
+library(stargazer)
+library(car)
+```
+****
+
+```{r,results='asis'}
+attach(dating)
+
+tab<-table(dating$cregion)/sum(table(dating$cregion))*100
+print(xtable(cbind("region"=tab), digits=0), type="html")
+
+tab<-table(dating$sex)/sum(table(dating$sex))*100
+print(xtable(cbind("gender (%)"=tab), digits=0), type="html")
+
+tab<-table(dating$educ2)/sum(table(dating$educ2))*100
+print(xtable(cbind("education  (%)"=tab), digits=0), type="html")
+
+tab<-table(dating$lifequal)/sum(table(dating$lifequal))*100
+print(xtable(cbind("quality of life  (%)"=tab), digits=0), type="html")
+
+x1=xtabs(~ mar +romantic)
+x2 = prop.table(x1,1)*100
+tab=xtable(cbind( "xtab between married and romantic " =x2))
+htmlTable(txtRound(tab,0), rowlabel = "Marital Status",
+          header=c("Yes (%)", "No (%)"),
+          cgroup = c("In A Romantic Relationship"),
+          n.cgroup= c(2))
+
+
+x1=xtabs(~ meet + sex)
+x2 = prop.table(x1,2)*100
+tab=xtable(cbind( "xtab between gender and meeting others"=x2))
+htmlTable(txtRound(tab,0), rowlabel = "Meeting Others", 
+          header=c("Male (%)","Female (%)"),
+          cgroup = c("Gender"), n.cgroup= c(2))
+
+tab<-table(dating$datingbrand)/sum(table(dating$datingbrand))*100
+print(xtable(cbind("Online dating service (%)"=tab), digits=0), type="html")
+
+```
+
+names(dating)
+
+
+##Data preperation
+
+```{r}
+dating$flirtonline <-factor(dating$flirtonline,
+                            labels = c("Flirts online", "Does not flirt online"))
+dating$email <-factor(dating$email,
+                            labels = c("Emails", "Does not email"))
+attach(dating)
+t1=xtabs(~ sex + metonline);gender=round(prop.table(t1,1)*100,2)
+t1=xtabs(~ mar + metonline);mar2=round(prop.table(t1,1)*100,2)
+t1=xtabs(~ email + metonline);email2=round(prop.table(t1,1)*100, 2)
+t1=xtabs(~ flirtonline + metonline);flirt2=round(prop.table(t1,1)*100,2)
+t1=xtabs(~ community + metonline);comm2=round(prop.table(t1,1)*100,2)
+tab=rbind(gender, mar2, email2, flirt2, comm2)
+
+c1<-rbind("sex","" , "marital","","","","","","email","", "flirting", "", "urban/rural","","" )
+
+colnames(c1) <- "categorical variable"
+tab1=  cbind(c1,"categories"=rownames(tab), tab)
+
+```
+
+****
+```{r, results='asis'}
+
+tab2 <-xtable(tab1, digits=2)
+print(tab2, type="html", include.rownames=FALSE, floating=FALSE)
+
+
+```
+****
+
+## Model estimation
+
+###Binary Logit: 
+How I met your mother?
+
+```{r, results='asis'}
+#table(dating$metonline)
+dating$metonline <- factor(dating$metonline, 
+                    levels = c("Met offline", "Met online"))
+print(xtable(
+   table(metonline)), 
+   type="html")
+```
+
+****
+
+
+```{r,echo=FALSE}
+
+mod.0 <- multinom(metonline ~ sex + cregion + mar + email +flirtonline + age +community, data=dating)
+
+```
+
+**How I met your mother?** 
+```{r,results='asis'}
+stargazer(mod.0, type="html", no.space=TRUE)
+
+stargazer(mod.0, type="html", no.space=TRUE, 
+          covariate.labels=c("Female", "midwest","south", "west", "living with a partner", 
+                             "divorced", "separated", "widowed", "never been married",
+                             "does not email", "does not flirt online", "age in years",
+                             "suburban", "urban"))
+
+## Exponentiated coefficients
+
+exponentiate <- function(x) (exp(x)-1)*100
+stargazer(mod.0, type="html", no.space=TRUE, apply.coef= exponentiate, se= list(NA), 
+          omit.table.layout = "a", 
+          dep.var.labels=c("Odds (%)"),
+          covariate.labels=c("Female", "midwest","south", "west", "living with a partner", 
+                             "divorced", "separated", "widowed", "never been married",
+                             "does not email", "does not flirt online", "age in years",
+                             "suburban", "urban"))
+```
+
+
+****
+
+
+###Type of dating service
+
+
+```{r, message=FALSE}
+newdata <- subset(dating, datingbrand == "Match.com" |   
+                  datingbrand == "eHarmony" |
+                  datingbrand == "OK Cupid" |
+                  datingbrand == "Plenty of Fish")
+newdata$datingbrand <- droplevels(newdata$datingbrand)
+
+attach(newdata)
+t1=xtabs(~ sex + datingbrand);gender=round(prop.table(t1,1)*100,2)
+t1=xtabs(~ community + datingbrand);community2=round(prop.table(t1,1)*100,2)
+t1=xtabs(~ par + datingbrand);parent2=round(prop.table(t1,1)*100,2)
+t1=xtabs(~ email + datingbrand);email2=round(prop.table(t1,1)*100, 2)
+t1=xtabs(~ intmob + datingbrand);intmob2=round(prop.table(t1,1)*100, 2)
+t1=xtabs(~ teletype + datingbrand);teletype2=round(prop.table(t1,1)*100, 2)
+
+
+tab=rbind(gender, community2, parent2, email2, intmob2, teletype2)
+
+c1<-rbind("sex","","community type", "","","parental status","","email","",
+          "mobile internet", "",  "telephone type","" )
+
+colnames(c1) <- "categorical variable"
+tab1=  cbind(c1,"categories"=rownames(tab), tab)
+```
+
+``` {r, results='asis'}
+
+tab2 <-xtable(tab1, digits=2)
+print(tab2, type="html", include.rownames=FALSE, floating=FALSE)
+
+
+```
+
+****
+
+```{r,echo=FALSE}
+
+newdata <- subset(dating, datingbrand == "Match.com" |   
+                  datingbrand == "eHarmony" |
+                  datingbrand == "OK Cupid" |
+                  datingbrand == "Plenty of Fish")
+newdata$datingbrand <- droplevels(newdata$datingbrand)
+cbind(table(newdata$datingbrand))
+
+mod.3 <- multinom(datingbrand ~ sex  + community + par + email +intmob +teletype  , 
+                  data=dating,
+                  subset=datingbrand == "Match.com" |   
+                  datingbrand == "eHarmony" |
+                  datingbrand == "OK Cupid" |
+                  datingbrand == "Plenty of Fish")
+```
+
+****
+
+
+```{r, results='asis'}
+
+stargazer(mod.3, type="html", no.space=TRUE)
+```
+
+###Multinomial Logit, phone type
+
+
+
+```{r, results='asis'}
+
+dating$intuse <-factor(dating$intuse,
+                            labels = c("Uses internet", "Does not use internet"))
+                            
+dating$par <-factor(dating$par,
+                            labels = c("Parent", "Not parent"))
+                            
+dating$intmob <-factor(dating$intmob,
+                            labels = c("Uses mobile internet", 
+                            "Does not use mobile internet"))
+                            
+attach(dating)
+t1=xtabs(~ sex + fonebrand);gender=round(prop.table(t1,1)*100,2)
+t1=xtabs(~ cregion + fonebrand);region2=round(prop.table(t1,1)*100,2)
+t1=xtabs(~ mar + fonebrand);mar2=round(prop.table(t1,1)*100,2)
+t1=xtabs(~ par + fonebrand);parent2=round(prop.table(t1,1)*100,2)
+t1=xtabs(~ intuse + fonebrand);intuse2=round(prop.table(t1,1)*100, 2)
+t1=xtabs(~ email + fonebrand);email2=round(prop.table(t1,1)*100, 2)
+t1=xtabs(~ intmob + fonebrand);intmob2=round(prop.table(t1,1)*100, 2)
+t1=xtabs(~ teletype + fonebrand);teletype2=round(prop.table(t1,1)*100, 2)
+
+
+tab=rbind(gender, region2, mar2, parent2, intuse2, email2, intmob2, teletype2)
+
+c1<-rbind("sex","","region", "","","", "marital","","","","","",
+          "parental status","","internet use","","email","",
+          "mobile internet", "",  "telephone type","" )
+
+colnames(c1) <- "categorical variable"
+tab1=  cbind(c1,"categories"=rownames(tab), tab)
+
+tab2 <-xtable(tab1, digits=2)
+print(tab2, type="html", include.rownames=FALSE, floating=FALSE)
+
+
+```
+
+****
+
+```{r,echo=FALSE}
+mod.1 <- multinom(fonebrand ~ sex + cregion + mar + par + intuse + email +intmob +teletype  , data=dating)
+
+```
+
+****
+####Phone type 
+```{r,results='asis'}
+stargazer(mod.1, type="html", no.space=TRUE)
+```
+
+**Recoding fonebrand into brand2**
+
+
+- Factor varaibles are changed for easy reading
+- Basic cellphone is now the base case.
+
+
+
+```{r}
+dating$brand2 <-dating$fonebrand
+dating$brand2 <-factor(dating$brand2, levels = c("(VOL.) Basic cell phone - unspecified",
+                                                 "iPhone", "Blackberry", "Android"), 
+                    labels = c("basic cell phone", "iPhone", "Blackberry", "Android"))
+
+```
+
+```{r, results='asis'}
+tab.1<- xtable(cbind(brand2=table(dating$brand2 )))
+tab.2<- xtable(cbind(fonebrand=table(dating$fonebrand)))
+print (tab.1, type="html")
+print (tab.2, type="html")
+```
+
+#####Re-estimating the Phone Type model
+
+```{r,echo=FALSE}
+mod.1 <- multinom(brand2 ~ sex + cregion + mar + par + intuse + email +intmob +teletype  , data=dating)
+
+```
+
+****
+ 
+
+```{r, results='asis'}
+
+stargazer(mod.1, type="html", no.space=TRUE, 
+          covariate.labels=c("Female", "midwest","south", "west", "living with a partner", 
+                             "divorced", "separated", "widowed", "never been married", 
+                             "no children", "does not use internet", "no email", 
+                             "no internet on mobile phone", 
+                             "respondent reached on cellular"))
+```
+
+

@@ -1,0 +1,69 @@
+		(1)	(2)	(3)	(4)
+		multinomial logit phone brand			
+VARIABLES	LABELS	iPhone	Blackberry	Android	Basic_cellphone
+					
+2.sex	SEX. Respondent's sex = 2, female	-0.352*	-0.980**	-0.519**	
+		(0.208)	(0.386)	(0.206)	
+2.cregion	Census Region - 2012 zip merge = 2, Midwest	-1.045***	-1.338**	-0.588*	
+		(0.331)	(0.571)	(0.331)	
+3.cregion	Census Region - 2012 zip merge = 3, South	-0.447	-0.943*	-0.342	
+		(0.304)	(0.501)	(0.314)	
+4.cregion	Census Region - 2012 zip merge = 4, West	-0.612*	-0.787	-0.292	
+		(0.335)	(0.545)	(0.340)	
+2.mar	MAR. Are you currently married, living with a partner, divorced, separated, wido = 2, Living with a partner	-0.0106	-0.685	0.466	
+		(0.452)	(1.076)	(0.423)	
+3.mar	MAR. Are you currently married, living with a partner, divorced, separated, wido = 3, Divorced	-0.231	-0.710	0.304	
+		(0.349)	(0.783)	(0.321)	
+4.mar	MAR. Are you currently married, living with a partner, divorced, separated, wido = 4, Separated	0.0775	0.977	-0.342	
+		(0.680)	(0.872)	(0.759)	
+5.mar	MAR. Are you currently married, living with a partner, divorced, separated, wido = 5, Widowed	0.0981	-1.044	-0.648	
+		(0.440)	(1.075)	(0.527)	
+6.mar	MAR. Are you currently married, living with a partner, divorced, separated, wido = 6, Never been married	0.253	-0.00428	0.552**	
+		(0.265)	(0.486)	(0.262)	
+2.par	PAR. Are you the parent or guardian of any children under age 18 now living in y = 2, No	-0.350	-0.146	-0.644***	
+		(0.234)	(0.438)	(0.230)	
+2.email	EMLOCC. Do you send or receive email, at least occasionally? = 2, No	-0.760*	0.360	-0.632*	
+		(0.406)	(0.612)	(0.374)	
+2.intuse	INTUSE. Do you use the internet, at least occasionally? = 2, No	-0.613	-0.183	0.471	
+		(0.593)	(0.819)	(0.480)	
+2.intmob	INTMOB. Do you access the internet on a cell phone, tablet or other mobile handh = 2, No	-3.395***	-2.359***	-3.324***	
+		(0.318)	(0.503)	(0.310)	
+2.teletype	Sample type = 2, Cell	0.294	-0.599	0.444**	
+		(0.210)	(0.391)	(0.210)	
+2o.sex	SEX. Respondent's sex = 2, omitted				-
+					
+2o.cregion	Census Region - 2012 zip merge = 2, omitted				-
+					
+3o.cregion	Census Region - 2012 zip merge = 3, omitted				-
+					
+4o.cregion	Census Region - 2012 zip merge = 4, omitted				-
+					
+2o.mar	MAR. Are you currently married, living with a partner, divorced, separated, wido = 2, omitted				-
+					
+3o.mar	MAR. Are you currently married, living with a partner, divorced, separated, wido = 3, omitted				-
+					
+4o.mar	MAR. Are you currently married, living with a partner, divorced, separated, wido = 4, omitted				-
+					
+5o.mar	MAR. Are you currently married, living with a partner, divorced, separated, wido = 5, omitted				-
+					
+6o.mar	MAR. Are you currently married, living with a partner, divorced, separated, wido = 6, omitted				-
+					
+2o.par	PAR. Are you the parent or guardian of any children under age 18 now living in y = 2, omitted				-
+					
+2o.email	EMLOCC. Do you send or receive email, at least occasionally? = 2, omitted				-
+					
+2o.intuse	INTUSE. Do you use the internet, at least occasionally? = 2, omitted				-
+					
+2o.intmob	INTMOB. Do you access the internet on a cell phone, tablet or other mobile handh = 2, omitted				-
+					
+2o.teletype	Sample type = 2, omitted				-
+					
+o._cons					0
+					(0)
+Constant	Constant	1.413***	0.222	1.232***	
+		(0.350)	(0.542)	(0.354)	
+					
+Observations		961	961	961	961
+Pseudo R-squared		0.236	0.236	0.236	0.236
+Standard errors in parentheses					
+*** p<0.01, ** p<0.05, * p<0.1					

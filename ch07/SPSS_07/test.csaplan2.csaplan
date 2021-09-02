@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<SPSSComplexSamples version="1.0">
+	<Header copyright="Copyright (c) IBM Corp., 2012. All Rights Reserved."/>
+	<AnalysisDesign SRSestimator="wor" numberOfStages="1">
+		<AnalysisStage estimationMethod="wr" stageNumber="1">
+			<ClusterVarList numberOfVariables="1">
+				<Variable name="prof"/>
+			</ClusterVarList>
+		</AnalysisStage>
+		<Weight>
+			<Variable name="weight"/>
+		</Weight>
+	</AnalysisDesign>
+</SPSSComplexSamples>
